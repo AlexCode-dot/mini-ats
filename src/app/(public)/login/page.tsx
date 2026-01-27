@@ -1,3 +1,5 @@
+import LoginView from "@/features/auth/components/LoginView/LoginView";
+
 export default function LoginPage() {
-  return <main style={{ padding: 24 }}>Login</main>;
+  return <LoginView />;
 }
