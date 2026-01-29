@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import { sanitizeRedirectPath } from "@/core/security/sanitizeRedirect";
 import { fetchUserRole, signInWithPassword } from "@/features/auth/services/authClient";
 
 export function useLogin() {
@@ -33,17 +34,11 @@ export function useLogin() {
         return;
       }
 
-      if (redirectTo) {
-        router.replace(redirectTo);
-        return;
-      }
-
-      if (role === "admin") {
-        router.replace("/admin");
-        return;
-      }
-
-      router.replace("/candidates");
+      const roleBasedDefault = role === "admin" ? "/admin" : "/candidates";
+      const safeRedirect = sanitizeRedirectPath(redirectTo, roleBasedDefault);
+      router.replace(safeRedirect);
+    } catch (err) {
+      setErrorMessage(err instanceof Error ? err.message : "Unable to sign in.");
     } finally {
       setIsLoading(false);
     }

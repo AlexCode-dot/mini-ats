@@ -13,6 +13,27 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/features/adminConsole/services/adminConsoleServer.internal",
+              message: "Use adminConsoleService wrapper instead of internal module.",
+            },
+          ],
+          patterns: [
+            {
+              group: ["**/adminConsoleServer.internal"],
+              message: "Use adminConsoleService wrapper instead of internal module.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;
