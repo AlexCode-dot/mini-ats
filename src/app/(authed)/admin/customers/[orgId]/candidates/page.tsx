@@ -1,7 +1,14 @@
 import { requireRole } from "@/core/auth/requireRole";
+import CustomerContextView from "@/features/adminConsole/components/CustomerContextView/CustomerContextView";
 
-export default async function AdminCustomerCandidatesPage() {
+export default async function AdminCustomerCandidatesPage({
+  params,
+}: {
+  params: Promise<{ orgId: string }>;
+}) {
   await requireRole(["admin"]);
 
-  return <main>Admin: Customer Candidates</main>;
+  const { orgId } = await params;
+
+  return <CustomerContextView orgId={orgId} view="candidates" />;
 }

@@ -1,0 +1,11 @@
+@use "shared/styles/variables" as vars;
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+.error {
+  color: vars.$color-danger-text;
+  font-size: 13px;
+}

@@ -2,12 +2,13 @@ import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
 
-import { env } from "@/core/env/env";
+import { publicEnv } from "@/core/env/publicEnv";
+import { serverEnv } from "@/core/env/serverEnv";
 
 export function createServiceSupabaseClient() {
   return createClient(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.SUPABASE_SERVICE_ROLE_KEY,
+    publicEnv.NEXT_PUBLIC_SUPABASE_URL,
+    serverEnv.SUPABASE_SERVICE_ROLE_KEY,
     {
       auth: {
         autoRefreshToken: false,

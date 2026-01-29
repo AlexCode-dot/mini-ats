@@ -1,0 +1,89 @@
+@use "shared/styles/variables" as vars;
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-right: 1px solid vars.$color-border;
+  background: vars.$color-surface;
+  min-height: 100vh;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.brandBox {
+  border: 1px solid vars.$color-border;
+  height: 74px;
+  padding: 0 14px;
+  background: vars.$color-surface;
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  padding: 15px 10px;
+  font-weight: 800;
+  font-size: 22px;
+  color: vars.$color-text;
+}
+
+.nav {
+  padding: 15px;
+  display: grid;
+  gap: 8px;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: vars.$color-text-muted;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.active {
+  color: vars.$color-primary-strong;
+  background: rgba(vars.$color-primary, 0.12);
+}
+
+.footer {
+  margin-top: auto;
+  padding: 20px;
+  border-top: 1px solid vars.$color-border;
+  color: vars.$color-text-muted;
+  font-size: 16px;
+}
+
+.email {
+  font-size: 12px;
+  color: vars.$color-text-muted;
+}
+
+.logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 15px;
+  border: 1px solid vars.$color-border;
+  background: vars.$color-surface;
+  color: vars.$color-text;
+  cursor: pointer;
+  padding: 10px 22px;
+  border-radius: 18px;
+  font-weight: 600;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 960px) {
+  .sidebar {
+    display: none;
+  }
+}

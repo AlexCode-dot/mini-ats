@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-import { env } from "@/core/env/env";
+import { publicEnv } from "@/core/env/publicEnv";
 
 const protectedPaths = ["/candidates", "/jobs", "/admin"];
 
@@ -17,8 +17,8 @@ export async function proxy(request: NextRequest) {
   });
 
   const supabase = createServerClient(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    publicEnv.NEXT_PUBLIC_SUPABASE_URL,
+    publicEnv.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll() {
@@ -40,7 +40,10 @@ export async function proxy(request: NextRequest) {
   if (!user && isProtectedPath(request.nextUrl.pathname)) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
-    redirectUrl.searchParams.set("redirect", request.nextUrl.pathname);
+    redirectUrl.searchParams.set(
+      "redirect",
+      `${request.nextUrl.pathname}${request.nextUrl.search}`
+    );
     return NextResponse.redirect(redirectUrl);
   }
 
