@@ -1,0 +1,14 @@
+@use "shared/styles/variables" as vars;
+
+.form {
+  display: grid;
+  gap: 12px;
+}
+
+.notice {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: vars.$color-bg;
+  font-size: 13px;
+  color: vars.$color-text-muted;
+}

@@ -25,7 +25,7 @@ export default async function AuthedLayout({
 
   return (
     <div className={styles.container}>
-      <AuthedHeader />
+      {profile.profile.role !== "admin" ? <AuthedHeader /> : null}
       {children}
     </div>
   );
