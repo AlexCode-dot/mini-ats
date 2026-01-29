@@ -4,7 +4,10 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { sanitizeRedirectPath } from "@/core/security/sanitizeRedirect";
-import { fetchUserRole, signInWithPassword } from "@/features/auth/services/authClient";
+import {
+  fetchUserRole,
+  signInWithPassword,
+} from "@/features/auth/services/authClient";
 
 export function useLogin() {
   const router = useRouter();
@@ -38,7 +41,9 @@ export function useLogin() {
       const safeRedirect = sanitizeRedirectPath(redirectTo, roleBasedDefault);
       router.replace(safeRedirect);
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : "Unable to sign in.");
+      setErrorMessage(
+        err instanceof Error ? err.message : "Unable to sign in."
+      );
     } finally {
       setIsLoading(false);
     }

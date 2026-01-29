@@ -1,0 +1,10 @@
+@use "../../styles/variables" as vars;
+
+.error {
+  border: 1px solid vars.$color-danger-border;
+  background: vars.$color-danger-surface;
+  color: vars.$color-danger-text;
+  padding: 10px 12px;
+  border-radius: vars.$radius-md;
+  font-size: 13px;
+}

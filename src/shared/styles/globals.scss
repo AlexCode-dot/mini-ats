@@ -1,3 +1,9 @@
 @use "reset";
-@use "variables";
+@use "variables" as vars;
 @use "mixins";
+
+body {
+  font-family: var(--font-sans), sans-serif;
+  background: vars.$color-bg;
+  color: vars.$color-text;
+}

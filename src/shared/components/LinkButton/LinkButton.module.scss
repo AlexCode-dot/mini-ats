@@ -1,0 +1,27 @@
+@use "../../styles/variables" as vars;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+  padding: 6px 12px;
+  border-radius: vars.$radius-pill;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.primary {
+  background: vars.$color-primary;
+  color: vars.$color-surface;
+  border-color: vars.$color-primary;
+}
+
+.secondary {
+  background: vars.$color-surface;
+  color: vars.$color-text;
+  border-color: vars.$color-border-strong;
+}

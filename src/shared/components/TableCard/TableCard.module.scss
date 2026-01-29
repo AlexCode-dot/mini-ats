@@ -1,0 +1,13 @@
+@use "../../styles/variables" as vars;
+@use "../../styles/mixins" as mixins;
+
+.card {
+  @include mixins.card(0);
+  overflow: visible;
+}
+
+.header {
+  padding: vars.$space-4 vars.$space-5;
+  font-weight: 600;
+  color: vars.$color-text;
+}

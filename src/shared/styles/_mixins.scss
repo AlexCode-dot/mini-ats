@@ -1,0 +1,15 @@
+@use "variables" as vars;
+
+@mixin card($padding: vars.$space-4) {
+  background: vars.$color-surface;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-lg;
+  padding: $padding;
+}
+
+@mixin input {
+  border: 1px solid vars.$color-border-strong;
+  border-radius: vars.$radius-md;
+  padding: 10px 12px;
+  background: vars.$color-surface;
+}

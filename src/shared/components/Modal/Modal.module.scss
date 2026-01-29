@@ -1,0 +1,46 @@
+@use "../../styles/variables" as vars;
+@use "../../styles/mixins" as mixins;
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.modal {
+  background: vars.$color-surface;
+  border-radius: vars.$radius-lg;
+  padding: 24px;
+  width: min(520px, 92vw);
+  box-shadow: 0 24px 48px vars.$color-shadow-strong;
+  display: grid;
+  gap: 16px;
+}
+
+.header {
+  font-size: 20px;
+  font-weight: 700;
+  color: vars.$color-text;
+}
+
+.body {
+  display: grid;
+  gap: 12px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

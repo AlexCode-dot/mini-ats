@@ -4,6 +4,8 @@ import { useState } from "react";
 
 import { useLogin } from "@/features/auth/hooks/useLogin";
 import styles from "@/features/auth/components/LoginView/LoginView.module.scss";
+import Button from "@/shared/components/Button/Button";
+import FormField from "@/shared/components/FormField/FormField";
 
 export default function LoginView() {
   const [email, setEmail] = useState("");
@@ -19,34 +21,28 @@ export default function LoginView() {
     <main className={styles.root}>
       <h1>Sign in</h1>
       <form className={styles.form} onSubmit={onSubmit}>
-        <label className={styles.field}>
-          Email
-          <input
-            name="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-        </label>
-        <label className={styles.field}>
-          Password
-          <input
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </label>
-        <button type="submit" disabled={isLoading}>
+        <FormField
+          label="Email"
+          name="email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+        />
+        <FormField
+          label="Password"
+          name="password"
+          type="password"
+          autoComplete="current-password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+        />
+        <Button type="submit" disabled={isLoading}>
           {isLoading ? "Signing in..." : "Sign in"}
-        </button>
-        {errorMessage ? (
-          <p className={styles.error}>{errorMessage}</p>
-        ) : null}
+        </Button>
+        {errorMessage ? <p className={styles.error}>{errorMessage}</p> : null}
       </form>
     </main>
   );

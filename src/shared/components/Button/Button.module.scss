@@ -1,0 +1,61 @@
+@use "../../styles/variables" as vars;
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  line-height: 1;
+  padding: 12px 20px;
+  border-radius: vars.$radius-md;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  font-size: 14px;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 16px;
+  transform: translateY(-1px);
+}
+
+.primary {
+  background: vars.$color-primary;
+  color: vars.$color-surface;
+  border-color: vars.$color-primary;
+}
+
+.secondary {
+  background: vars.$color-surface;
+  color: vars.$color-text;
+  border-color: vars.$color-border-strong;
+}
+
+.ghost {
+  background: transparent;
+  color: vars.$color-primary;
+  border-color: transparent;
+  padding: 8px 12px;
+}
+
+.inverse {
+  background: rgba(255, 255, 255, 0.12);
+  color: vars.$color-surface;
+  border-color: transparent;
+}
+
+.sm {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.md {
+  padding: 12px 20px;
+}
+
+.fullWidth {
+  width: 100%;
+}

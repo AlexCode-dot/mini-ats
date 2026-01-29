@@ -1,0 +1,21 @@
+@use "../../styles/variables" as vars;
+@use "../../styles/mixins" as mixins;
+
+.search {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  align-items: center;
+  gap: vars.$space-2;
+  @include mixins.input;
+  color: vars.$color-text-muted;
+}
+
+.search input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  background: transparent;
+  color: inherit;
+}
