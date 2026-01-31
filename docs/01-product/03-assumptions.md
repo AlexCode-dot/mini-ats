@@ -171,3 +171,4 @@ To prevent accidental data loss, destructive actions in the MVP use soft deletio
 Jobs are closed rather than deleted.
 Candidates can be archived.
 Pipeline stages can only be removed if they are empty or after reassignment.
+Archived candidates can be purged later with a scheduled cleanup (out of scope for the MVP).
