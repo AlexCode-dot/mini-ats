@@ -1,0 +1,13 @@
+@use "shared/styles/variables" as vars;
+
+.form {
+  display: grid;
+  gap: 14px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+}

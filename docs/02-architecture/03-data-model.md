@@ -22,6 +22,7 @@
 - org_id (uuid, fk)
 - title (text)
 - status (text: open | closed)
+- job_url (text, nullable)
 - created_at (timestamp)
 
 ## candidates
@@ -33,6 +34,7 @@
 - email (text, nullable)
 - linkedin_url (text, nullable)
 - stage_id (uuid, fk → pipeline_stages.id)
+- is_archived (boolean, default false)
 - created_at (timestamp)
 
 ## pipeline_stages

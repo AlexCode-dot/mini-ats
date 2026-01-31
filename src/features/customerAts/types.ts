@@ -19,7 +19,20 @@ export type CustomerJob = {
   id: string;
   title: string;
   status: string | null;
+  job_url: string | null;
   created_at: string;
+};
+
+export type CreateJobPayload = {
+  title: string;
+  status?: string | null;
+  jobUrl?: string | null;
+};
+
+export type UpdateJobPayload = {
+  title: string;
+  status?: string | null;
+  jobUrl?: string | null;
 };
 
 export type CreateCandidatePayload = {

@@ -12,3 +12,28 @@
   justify-content: flex-end;
   gap: 12px;
 }
+
+.confirmBlock {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.confirmLabel {
+  font-size: 13px;
+  color: vars.$color-text-muted;
+}
+
+.confirmInput {
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: vars.$color-text;
+  background: vars.$color-surface;
+}
+
+.confirmInput:focus {
+  outline: 2px solid rgba(vars.$color-primary, 0.2);
+  outline-offset: 2px;
+}
