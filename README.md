@@ -29,6 +29,12 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Security Notes
+
+- Supabase-hosted projects use protected roles (for example `supabase_admin`) that cannot be modified from the SQL editor, even as project owner.
+- Mitigation in this project: explicit table grants, forced RLS on all tenant tables, and restricted function EXECUTE privileges. Do not rely on default privileges.
+- When adding new tables/functions, always: enable + force RLS, add policies, and explicitly grant only required privileges.
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.

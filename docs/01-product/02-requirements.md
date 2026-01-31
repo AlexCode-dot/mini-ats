@@ -28,6 +28,7 @@
 - Simple, intuitive UI
 - Production-ready database structure
 - Destructive actions are constrained; data is archived or deactivated rather than hard-deleted in the MVP
+- Exception: pipeline stages are hard-deleted in the MVP once candidates have been moved to a fallback stage
 
 ## Constraints
 
