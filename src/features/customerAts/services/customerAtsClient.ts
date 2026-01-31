@@ -1,11 +1,13 @@
 import { createBrowserSupabaseClient } from "@/core/supabase/browserClient";
 import type {
   CreateCandidatePayload,
+  CreateJobPayload,
   CustomerCandidate,
   CustomerJob,
   CustomerStage,
   StageDraft,
   UpdateCandidatePayload,
+  UpdateJobPayload,
 } from "@/features/customerAts/types";
 
 let cachedOrgId: string | null = null;
@@ -82,7 +84,7 @@ export async function listCustomerJobs(): Promise<CustomerJob[]> {
   const orgId = await getOrgId();
   const { data, error } = await supabase
     .from("jobs")
-    .select("id, title, status, created_at")
+    .select("id, title, status, job_url, created_at")
     .eq("org_id", orgId)
     .order("created_at", { ascending: false });
 
@@ -93,13 +95,56 @@ export async function listCustomerJobs(): Promise<CustomerJob[]> {
   return (data ?? []) as CustomerJob[];
 }
 
+export async function createJob(payload: CreateJobPayload) {
+  const supabase = createBrowserSupabaseClient();
+  const orgId = await getOrgId();
+  const { error } = await supabase.from("jobs").insert({
+    org_id: orgId,
+    title: payload.title,
+    status: payload.status ?? "open",
+    job_url: payload.jobUrl ?? null,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function updateJob(jobId: string, payload: UpdateJobPayload) {
+  const supabase = createBrowserSupabaseClient();
+  const { error } = await supabase
+    .from("jobs")
+    .update({
+      title: payload.title,
+      status: payload.status ?? "open",
+      job_url: payload.jobUrl ?? null,
+    })
+    .eq("id", jobId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function deleteJob(jobId: string) {
+  const supabase = createBrowserSupabaseClient();
+  const { error } = await supabase.from("jobs").delete().eq("id", jobId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function listCustomerCandidates(): Promise<CustomerCandidate[]> {
   const supabase = createBrowserSupabaseClient();
   const orgId = await getOrgId();
   const { data, error } = await supabase
     .from("candidates")
-    .select("id, name, email, linkedin_url, stage_id, job_id, jobs(title)")
-    .eq("org_id", orgId);
+    .select(
+      "id, name, email, linkedin_url, stage_id, job_id, is_archived, jobs(title)"
+    )
+    .eq("org_id", orgId)
+    .eq("is_archived", false);
 
   if (error) {
     throw new Error(error.message);

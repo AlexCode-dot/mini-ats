@@ -18,14 +18,36 @@
   gap: 12px;
 }
 
-.jobRow {
-  display: grid;
-  grid-template-columns: minmax(200px, 1fr) 120px 140px;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid vars.$color-border;
-  border-radius: vars.$radius-md;
-  background: vars.$color-surface;
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 12px 20px;
+  border-top: 1px solid vars.$color-border;
+  font-size: 14px;
+  color: vars.$color-text-muted;
+}
+
+.table th {
+  text-transform: uppercase;
+  font-size: 12px;
+  color: vars.$color-text-muted;
+  letter-spacing: 0.04em;
+}
+
+.table th:nth-child(2),
+.table th:nth-child(3),
+.table th:nth-child(4),
+.table th:nth-child(5),
+.table td:nth-child(2),
+.table td:nth-child(3),
+.table td:nth-child(4),
+.table td:nth-child(5) {
+  text-align: center;
 }
 
 .jobTitle {
@@ -36,6 +58,94 @@
 .jobMeta {
   color: vars.$color-text-muted;
   font-size: 13px;
+}
+
+.jobLink {
+  color: vars.$color-primary;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.jobLink:hover {
+  text-decoration: underline;
+}
+
+.actionRow {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.actionPrimary {
+  border-radius: vars.$radius-pill;
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.inlineButton {
+  border: none;
+  background: none;
+  color: vars.$color-text;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.inlineButton:hover {
+  text-decoration: underline;
+}
+
+.inlineButtonDanger {
+  border: none;
+  background: none;
+  color: vars.$color-danger-text;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.menu {
+  position: relative;
+}
+
+.menuButton {
+  border: 1px solid vars.$color-border-strong;
+  background: vars.$color-surface;
+  color: vars.$color-text;
+  padding: 4px 16px;
+  border-radius: 999px;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.menuDropdown {
+  position: absolute;
+  right: 0;
+  top: 36px;
+  min-width: 140px;
+  background: vars.$color-surface;
+  border: 1px solid vars.$color-border;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 16px 30px vars.$color-shadow-strong;
+  z-index: 5;
+}
+
+.menuItem {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.menuItem:disabled {
+  color: vars.$color-text-muted;
+  cursor: not-allowed;
+}
+
+.inlineButtonDanger:hover {
+  text-decoration: underline;
 }
 
 .empty {
@@ -52,6 +162,37 @@
   display: none;
 }
 
+.mobileList {
+  display: none;
+}
+
+.card {
+  @include mixins.card(vars.$space-4);
+  display: grid;
+  gap: 8px;
+}
+
+.cardTitle {
+  font-weight: 600;
+  color: vars.$color-text;
+}
+
+.cardMeta {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  color: vars.$color-text-muted;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+
+.mobileActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
 @media (max-width: 860px) {
   .headerRow {
     display: none;
@@ -61,7 +202,17 @@
     display: block;
   }
 
-  .jobRow {
-    grid-template-columns: 1fr;
+  .table {
+    display: none;
+  }
+
+  .mobileList {
+    display: grid;
+    gap: 12px;
+    padding: 0;
+  }
+
+  .actionRow {
+    justify-content: flex-start;
   }
 }
