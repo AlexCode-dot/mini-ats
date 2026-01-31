@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
 
-import AuthedHeader from "@/features/shell/components/AuthedHeader/AuthedHeader";
 import { getCurrentProfile } from "@/core/auth/getCurrentProfile";
 import { requireSession } from "@/core/auth/requireSession";
 import styles from "@/app/(authed)/layout.module.scss";
@@ -23,10 +22,5 @@ export default async function AuthedLayout({
     redirect("/login?reason=inactive");
   }
 
-  return (
-    <div className={styles.container}>
-      {profile.profile.role !== "admin" ? <AuthedHeader /> : null}
-      {children}
-    </div>
-  );
+  return <div className={styles.container}>{children}</div>;
 }

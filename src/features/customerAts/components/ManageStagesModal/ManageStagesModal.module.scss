@@ -1,0 +1,76 @@
+@use "shared/styles/variables" as vars;
+@use "shared/styles/mixins" as mixins;
+
+.listWrapper {
+  display: grid;
+  gap: vars.$space-3;
+}
+
+.stageList {
+  display: grid;
+  gap: vars.$space-3;
+}
+
+.stageRow {
+  @include mixins.card(vars.$space-3);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: vars.$space-3;
+  align-items: center;
+}
+
+.stageRow input {
+  @include mixins.input;
+  width: 100%;
+}
+
+.dragHandle {
+  border: none;
+  background: transparent;
+  display: grid;
+  gap: 3px;
+  padding: 0 4px;
+  cursor: grab;
+  color: vars.$color-text-muted;
+}
+
+.dragDots {
+  width: 4px;
+  height: 4px;
+  background: vars.$color-text-muted;
+  border-radius: 50%;
+  display: block;
+}
+
+.deleteButton {
+  border: none;
+  background: transparent;
+  color: vars.$color-text-muted;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+}
+
+.deleteButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: vars.$space-3;
+  margin-top: vars.$space-3;
+}
+
+@media (max-width: 640px) {
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}

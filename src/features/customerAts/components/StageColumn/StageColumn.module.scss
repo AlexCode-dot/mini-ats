@@ -1,0 +1,60 @@
+@use "shared/styles/variables" as vars;
+@use "shared/styles/mixins" as mixins;
+
+.column {
+  @include mixins.card(vars.$space-3);
+  min-width: 260px;
+  max-width: 340px;
+  width: 100%;
+  display: grid;
+  gap: 15px;
+  grid-template-rows: auto 1fr;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  height: 100%;
+  align-content: start;
+}
+
+@media (max-width: 860px) {
+  .column {
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .list {
+    min-height: 220px;
+  }
+}
+
+.over {
+  border-color: vars.$color-primary;
+  box-shadow: 0 0 0 2px rgba(vars.$color-primary, 0.12);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: vars.$color-text;
+  padding-bottom: 15px;
+  margin-left: 5px;
+  border-bottom: 1px solid vars.$color-border;
+}
+
+.count {
+  background: vars.$color-border;
+  color: vars.$color-text;
+  border-radius: vars.$radius-pill;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}

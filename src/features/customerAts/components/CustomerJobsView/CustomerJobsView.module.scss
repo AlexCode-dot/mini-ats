@@ -1,0 +1,67 @@
+@use "shared/styles/variables" as vars;
+@use "shared/styles/mixins" as mixins;
+
+.page {
+  display: grid;
+  gap: 20px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.jobList {
+  display: grid;
+  gap: 12px;
+}
+
+.jobRow {
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) 120px 140px;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid vars.$color-border;
+  border-radius: vars.$radius-md;
+  background: vars.$color-surface;
+}
+
+.jobTitle {
+  font-weight: 600;
+  color: vars.$color-text;
+}
+
+.jobMeta {
+  color: vars.$color-text-muted;
+  font-size: 13px;
+}
+
+.empty {
+  color: vars.$color-text-muted;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+.loading {
+  color: vars.$color-text-muted;
+}
+
+.mobileAction {
+  display: none;
+}
+
+@media (max-width: 860px) {
+  .headerRow {
+    display: none;
+  }
+
+  .mobileAction {
+    display: block;
+  }
+
+  .jobRow {
+    grid-template-columns: 1fr;
+  }
+}
