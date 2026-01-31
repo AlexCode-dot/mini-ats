@@ -1,0 +1,75 @@
+@use "shared/styles/variables" as vars;
+@use "shared/styles/mixins" as mixins;
+
+.card {
+  @include mixins.card(vars.$space-3);
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: vars.$color-text-muted;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+  position: relative;
+  padding-right: 36px;
+}
+
+.card:hover {
+  border-color: vars.$color-primary;
+}
+
+.dragging {
+  box-shadow: 0 12px 24px vars.$color-shadow;
+  cursor: grabbing;
+}
+
+.name {
+  font-weight: 600;
+  color: vars.$color-text;
+}
+
+.role {
+  color: vars.$color-text-muted;
+}
+
+.meta {
+  font-size: 12px;
+}
+
+.handle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  color: vars.$color-text-muted;
+  cursor: grab;
+  display: grid;
+  place-items: center;
+}
+
+.handle svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 860px) {
+  .card {
+    padding: vars.$space-4;
+    font-size: 14px;
+    padding-right: 36px;
+  }
+
+  .name {
+    font-size: 16px;
+  }
+
+  .meta {
+    font-size: 13px;
+  }
+}

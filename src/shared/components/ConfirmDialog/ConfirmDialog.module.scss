@@ -1,0 +1,14 @@
+@use "@/shared/styles/variables" as vars;
+
+.message {
+  margin: 0 0 20px;
+  color: vars.$color-text;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
