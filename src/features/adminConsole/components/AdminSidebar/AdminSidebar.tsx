@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-import { createBrowserSupabaseClient } from "@/core/supabase/browserClient";
+import { signOutUser } from "@/core/auth/signOut";
 import styles from "@/features/adminConsole/components/AdminSidebar/AdminSidebar.module.scss";
 
 const navItems = [
@@ -124,8 +124,7 @@ export default function AdminSidebar() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const supabase = createBrowserSupabaseClient();
-    await supabase.auth.signOut();
+    await signOutUser();
     router.replace("/login");
   };
 

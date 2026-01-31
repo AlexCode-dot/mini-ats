@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 
-import { createBrowserSupabaseClient } from "@/core/supabase/browserClient";
+import { signOutUser } from "@/core/auth/signOut";
+import { useMe } from "@/core/auth/useMe";
 import AdminSidebar from "@/features/adminConsole/components/AdminSidebar/AdminSidebar";
 import styles from "@/features/adminConsole/components/AdminShell/AdminShell.module.scss";
 
@@ -78,37 +79,9 @@ export default function AdminShell({
 }: AdminShellProps) {
   const pathname = usePathname();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [profileLabel, setProfileLabel] = useState("Admin User");
-  const [profileEmail, setProfileEmail] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadProfile = async () => {
-      try {
-        const response = await fetch("/api/me");
-        if (!response.ok) {
-          return;
-        }
-        const data = (await response.json()) as {
-          name: string | null;
-          email: string | null;
-        };
-        if (isMounted) {
-          setProfileLabel(data.name ?? "Admin User");
-          setProfileEmail(data.email ?? null);
-        }
-      } catch {
-        // Ignore failures to keep shell stable.
-      }
-    };
-
-    loadProfile();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { profile } = useMe();
+  const profileLabel = profile.name ?? "Admin User";
+  const profileEmail = profile.email ?? null;
 
   useEffect(() => {
     if (!isUserMenuOpen) return;
@@ -126,8 +99,7 @@ export default function AdminShell({
   }, [isUserMenuOpen]);
 
   const handleLogout = async () => {
-    const supabase = createBrowserSupabaseClient();
-    await supabase.auth.signOut();
+    await signOutUser();
     window.location.href = "/login";
   };
 

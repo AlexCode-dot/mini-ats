@@ -2,15 +2,14 @@
 
 import { useRouter } from "next/navigation";
 
-import { createBrowserSupabaseClient } from "@/core/supabase/browserClient";
+import { signOutUser } from "@/core/auth/signOut";
 import styles from "@/features/shell/components/AuthedHeader/AuthedHeader.module.scss";
 
 export default function AuthedHeader() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    const supabase = createBrowserSupabaseClient();
-    await supabase.auth.signOut();
+    await signOutUser();
     router.replace("/login");
   };
 
