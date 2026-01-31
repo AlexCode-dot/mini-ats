@@ -60,10 +60,21 @@ export default function CandidateCard({
       <div className={styles.name}>{candidate.name}</div>
       {candidate.job_title ? (
         <div className={styles.role}>{candidate.job_title}</div>
-      ) : null}
+      ) : (
+        <div className={styles.warning}>
+          <span className={styles.warningIcon} aria-hidden>
+            !
+          </span>
+          No job linked
+        </div>
+      )}
       {candidate.email ? (
         <div className={styles.meta}>{candidate.email}</div>
-      ) : null}
+      ) : (
+        <div className={`${styles.meta} ${styles.placeholder}`}>
+          No email
+        </div>
+      )}
     </div>
   );
 }

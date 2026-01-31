@@ -13,6 +13,8 @@
     transform 0.2s ease;
   position: relative;
   padding-right: 36px;
+  min-height: 92px;
+  align-content: start;
 }
 
 .card:hover {
@@ -31,10 +33,44 @@
 
 .role {
   color: vars.$color-text-muted;
+  min-height: 18px;
 }
 
 .meta {
   font-size: 12px;
+  min-height: 16px;
+}
+
+.warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: vars.$color-danger-text;
+  background: vars.$color-danger-surface;
+  border: 1px solid vars.$color-danger-border;
+  padding: 4px 8px;
+  border-radius: vars.$radius-pill;
+  min-height: 18px;
+  width: fit-content;
+}
+
+.warningIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: vars.$color-danger-text;
+  color: vars.$color-danger-surface;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.placeholder {
+  opacity: 0.6;
 }
 
 .handle {
@@ -63,6 +99,7 @@
     padding: vars.$space-4;
     font-size: 14px;
     padding-right: 36px;
+    min-height: 104px;
   }
 
   .name {

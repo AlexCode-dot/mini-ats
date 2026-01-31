@@ -164,6 +164,18 @@ export async function listCustomerCandidates(): Promise<CustomerCandidate[]> {
   });
 }
 
+export async function archiveCandidate(candidateId: string) {
+  const supabase = createBrowserSupabaseClient();
+  const { error } = await supabase
+    .from("candidates")
+    .update({ is_archived: true })
+    .eq("id", candidateId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
 export async function createCandidate(payload: CreateCandidatePayload) {
   const supabase = createBrowserSupabaseClient();
   const orgId = await getOrgId();

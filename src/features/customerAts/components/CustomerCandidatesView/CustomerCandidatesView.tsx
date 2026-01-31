@@ -14,13 +14,18 @@ import Button from "@/shared/components/Button/Button";
 import InlineError from "@/shared/components/InlineError/InlineError";
 import SearchInput from "@/shared/components/SearchInput/SearchInput";
 import SelectField from "@/shared/components/SelectField/SelectField";
+import ConfirmDialog from "@/shared/components/ConfirmDialog/ConfirmDialog";
 import AddCandidateModal from "@/features/customerAts/components/AddCandidateModal/AddCandidateModal";
+import CandidateDetailsModal from "@/features/customerAts/components/CandidateDetailsModal/CandidateDetailsModal";
 import ManageStagesModal from "@/features/customerAts/components/ManageStagesModal/ManageStagesModal";
 import StageColumn from "@/features/customerAts/components/StageColumn/StageColumn";
 import CandidateCard from "@/features/customerAts/components/CandidateCard/CandidateCard";
 import CustomerShell from "@/features/customerAts/components/CustomerShell/CustomerShell";
 import { useCustomerOrgName } from "@/features/customerAts/hooks/useCustomerOrgName";
-import { updateCandidateStage } from "@/features/customerAts/services/customerAtsClient";
+import {
+  archiveCandidate,
+  updateCandidateStage,
+} from "@/features/customerAts/services/customerAtsClient";
 import { useCustomerBoard } from "@/features/customerAts/hooks/useCustomerBoard";
 import styles from "@/features/customerAts/components/CustomerCandidatesView/CustomerCandidatesView.module.scss";
 
@@ -35,6 +40,12 @@ export default function CustomerCandidatesView() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [editingCandidate, setEditingCandidate] = useState<
+    (typeof candidates)[number] | null
+  >(null);
+  const [detailsCandidate, setDetailsCandidate] = useState<
+    (typeof candidates)[number] | null
+  >(null);
+  const [pendingArchive, setPendingArchive] = useState<
     (typeof candidates)[number] | null
   >(null);
 
@@ -61,6 +72,15 @@ export default function CustomerCandidatesView() {
     });
     return counts;
   }, [candidates]);
+
+  const jobsById = useMemo(() => {
+    return new Map(jobs.map((job) => [job.id, job]));
+  }, [jobs]);
+
+  const openJobs = useMemo(
+    () => jobs.filter((job) => job.status !== "closed"),
+    [jobs]
+  );
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
@@ -150,11 +170,16 @@ export default function CustomerCandidatesView() {
               onChange={(event) => setJobFilter(event.target.value)}
             >
               <option value="">All Jobs</option>
-              {jobs.map((job) => (
+              {openJobs.map((job) => (
                 <option key={job.id} value={job.id}>
                   {job.title}
                 </option>
               ))}
+              {jobFilter && jobsById.get(jobFilter)?.status === "closed" ? (
+                <option value={jobFilter} disabled>
+                  {jobsById.get(jobFilter)?.title} (Closed)
+                </option>
+              ) : null}
             </SelectField>
           </div>
           <div className={styles.actions}>
@@ -239,8 +264,7 @@ export default function CustomerCandidatesView() {
                           key={candidate.id}
                           candidate={candidate}
                           onOpen={() => {
-                            setEditingCandidate(candidate);
-                            setIsAddOpen(true);
+                            setDetailsCandidate(candidate);
                           }}
                         />
                       ))
@@ -274,6 +298,40 @@ export default function CustomerCandidatesView() {
           jobs={jobs}
           stages={stages}
           candidate={editingCandidate}
+        />
+        <CandidateDetailsModal
+          open={Boolean(detailsCandidate)}
+          onClose={() => setDetailsCandidate(null)}
+          candidate={detailsCandidate}
+          onEdit={(candidate) => {
+            setDetailsCandidate(null);
+            setEditingCandidate(candidate);
+            setIsAddOpen(true);
+          }}
+          onArchive={(candidate) => {
+            setDetailsCandidate(null);
+            setPendingArchive(candidate);
+          }}
+        />
+        <ConfirmDialog
+          open={Boolean(pendingArchive)}
+          title="Archive candidate?"
+          message="Archiving removes the candidate from the board but keeps their data for history."
+          confirmLabel="Archive"
+          onConfirm={async () => {
+            if (!pendingArchive) return;
+            try {
+              await archiveCandidate(pendingArchive.id);
+              await refresh();
+            } catch (err) {
+              setActionError(
+                err instanceof Error ? err.message : "Failed to archive"
+              );
+            } finally {
+              setPendingArchive(null);
+            }
+          }}
+          onCancel={() => setPendingArchive(null)}
         />
 
         <ManageStagesModal

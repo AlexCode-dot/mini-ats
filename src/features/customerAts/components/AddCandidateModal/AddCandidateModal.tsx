@@ -43,6 +43,21 @@ export default function AddCandidateModal({
   const [isSaving, setIsSaving] = useState(false);
   const isEditing = Boolean(candidate);
 
+  const jobsById = useMemo(() => {
+    return new Map(jobs.map((job) => [job.id, job]));
+  }, [jobs]);
+
+  const openJobs = useMemo(
+    () => jobs.filter((job) => job.status !== "closed"),
+    [jobs]
+  );
+
+  const isSelectedJobOpen = useMemo(() => {
+    if (!jobId) return false;
+    const job = jobsById.get(jobId);
+    return job?.status !== "closed";
+  }, [jobId, jobsById]);
+
   const defaultStage = useMemo(
     () => [...stages].sort((a, b) => a.position - b.position)[0] ?? null,
     [stages]
@@ -68,8 +83,8 @@ export default function AddCandidateModal({
     event.preventDefault();
     setError(null);
 
-    if (jobs.length === 0) {
-      setError("Create a job first before adding candidates.");
+    if (openJobs.length === 0) {
+      setError("Create an open job before adding candidates.");
       return;
     }
 
@@ -80,6 +95,16 @@ export default function AddCandidateModal({
 
     if (!jobId) {
       setError("Please select a job");
+      return;
+    }
+
+    if (!isEditing && !isSelectedJobOpen) {
+      setError("You can only add candidates to open jobs.");
+      return;
+    }
+
+    if (isEditing && candidate?.job_id !== jobId && !isSelectedJobOpen) {
+      setError("You can only move candidates to open jobs.");
       return;
     }
 
@@ -147,11 +172,17 @@ export default function AddCandidateModal({
           required
         >
           <option value="">Select a job...</option>
-          {jobs.map((job) => (
+          {openJobs.map((job) => (
             <option key={job.id} value={job.id}>
               {job.title}
             </option>
           ))}
+          {candidate?.job_id &&
+          jobsById.get(candidate.job_id)?.status === "closed" ? (
+            <option value={candidate.job_id} disabled>
+              {jobsById.get(candidate.job_id)?.title} (Closed)
+            </option>
+          ) : null}
         </SelectField>
         <FormField
           label="Email (optional)"
