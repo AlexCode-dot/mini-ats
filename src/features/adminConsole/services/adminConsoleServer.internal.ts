@@ -9,13 +9,9 @@ import {
   MIN_PASSWORD_LENGTH,
 } from "@/core/validation/isPasswordStrong";
 import type {
-  AdminCandidate,
   AdminAdminRow,
-  AdminCandidatesResponse,
-  AdminJob,
   AdminOrgRow,
   AdminOrgSummary,
-  AdminStage,
   CreateAdminPayload,
   CreateAdminResponse,
   CreateOrganizationPayload,
@@ -516,72 +512,6 @@ export async function getOrganizationSummary(
 ): Promise<AdminOrgSummary> {
   const supabase = createServiceSupabaseClient();
   return getOrgCounts(supabase, orgId);
-}
-
-export async function listOrganizationCandidates(
-  orgId: string
-): Promise<AdminCandidatesResponse> {
-  const supabase = createServiceSupabaseClient();
-
-  const { data: stages, error: stageError } = await supabase
-    .from("pipeline_stages")
-    .select("id, name, position, is_terminal")
-    .eq("org_id", orgId)
-    .order("position", { ascending: true });
-
-  if (stageError) {
-    throw new AdminConsoleError(stageError.message);
-  }
-
-  const { data: candidates, error: candidateError } = await supabase
-    .from("candidates")
-    .select(
-      "id, name, email, stage_id, jobs(title), pipeline_stages(id, name, position)"
-    )
-    .eq("org_id", orgId);
-
-  if (candidateError) {
-    throw new AdminConsoleError(candidateError.message);
-  }
-
-  const normalizedCandidates: AdminCandidate[] = (candidates ?? []).map(
-    (row) => {
-      const stage = Array.isArray(row.pipeline_stages)
-        ? row.pipeline_stages[0]
-        : row.pipeline_stages;
-      const job = Array.isArray(row.jobs) ? row.jobs[0] : row.jobs;
-
-      return {
-        id: row.id,
-        name: row.name,
-        email: row.email ?? null,
-        stage_id: row.stage_id,
-        stage_name: stage?.name ?? "Unassigned",
-        stage_position: stage?.position ?? 0,
-        job_title: job?.title ?? null,
-      };
-    }
-  );
-
-  return {
-    stages: (stages ?? []) as AdminStage[],
-    candidates: normalizedCandidates,
-  };
-}
-
-export async function listOrganizationJobs(orgId: string): Promise<AdminJob[]> {
-  const supabase = createServiceSupabaseClient();
-  const { data, error } = await supabase
-    .from("jobs")
-    .select("id, title, status, created_at")
-    .eq("org_id", orgId)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw new AdminConsoleError(error.message);
-  }
-
-  return (data ?? []) as AdminJob[];
 }
 
 export function isAdminConsoleError(
