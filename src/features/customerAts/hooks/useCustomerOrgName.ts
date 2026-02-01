@@ -1,36 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 
-import { getOrgName } from "@/features/customerAts/services/customerAtsClient";
+import { createCustomerAtsClient } from "@/features/customerAts/services/atsClient";
+import { useAtsOrgName } from "@/features/customerAts/hooks/useAtsOrgName";
 
 export function useCustomerOrgName() {
-  const [orgName, setOrgName] = useState<string>("Organization");
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadOrg = async () => {
-      try {
-        const name = await getOrgName();
-        if (isMounted) {
-          setOrgName(name);
-        }
-      } catch (err) {
-        if (!isMounted) return;
-        setError(
-          err instanceof Error ? err.message : "Failed to load organization"
-        );
-      }
-    };
-
-    loadOrg();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  return { orgName, error };
+  const client = useMemo(() => createCustomerAtsClient(), []);
+  return useAtsOrgName(client);
 }
