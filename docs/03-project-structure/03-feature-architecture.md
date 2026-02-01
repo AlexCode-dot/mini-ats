@@ -20,6 +20,18 @@ features/(feature-name)/
 - **services/**  
   Handles Supabase queries and mutations only
 
+### Large hook return values
+
+When a hook returns many values (roughly 8+), group them into
+objects like `state`, `filters`, `data`, `modals`, and `actions`.
+This keeps call sites readable and clarifies responsibility boundaries.
+
+Example:
+
+```ts
+const { state, data, actions } = useExampleFeature();
+```
+
 This separation allows:
 
 - Easy testing
