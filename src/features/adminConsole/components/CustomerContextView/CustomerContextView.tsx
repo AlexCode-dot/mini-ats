@@ -2,28 +2,28 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import type { ReactNode } from "react";
 
 import AdminShell from "@/features/adminConsole/components/AdminShell/AdminShell";
 import CustomerContextBanner from "@/features/adminConsole/components/CustomerContextBanner/CustomerContextBanner";
-import { useAdminCustomerContext } from "@/features/adminConsole/hooks/useAdminCustomerContext";
 import { useAdminOrganizations } from "@/features/adminConsole/hooks/useAdminOrganizations";
 import styles from "@/features/adminConsole/components/CustomerContextView/CustomerContextView.module.scss";
 import InlineError from "@/shared/components/InlineError/InlineError";
-import Button from "@/shared/components/Button/Button";
 
 type CustomerContextViewProps = {
   orgId: string;
   view: "candidates" | "jobs";
+  children?: ReactNode;
 };
 
 export default function CustomerContextView({
   orgId,
   view,
+  children,
 }: CustomerContextViewProps) {
   const router = useRouter();
-  const { organizations, isLoading, error } = useAdminOrganizations();
-  const customerContext = useAdminCustomerContext(orgId, view);
-  const activeOrg = organizations.find((org) => org.id === orgId);
+  const { state, data } = useAdminOrganizations();
+  const activeOrg = data.organizations.find((org) => org.id === orgId);
   const orgName = activeOrg?.name ?? "Customer";
 
   const handleSwitchOrg = (nextOrgId: string) => {
@@ -37,13 +37,13 @@ export default function CustomerContextView({
   return (
     <AdminShell title={view === "candidates" ? "Candidates" : "Jobs"}>
       <div className={styles.page}>
-        <InlineError message={error} />
-        {isLoading ? <div>Loading...</div> : null}
-        {!isLoading && organizations.length ? (
+        <InlineError message={state.error} />
+        {state.isLoading ? <div>Loading...</div> : null}
+        {!state.isLoading && data.organizations.length ? (
           <CustomerContextBanner
             orgId={orgId}
             orgName={orgName}
-            organizations={organizations}
+            organizations={data.organizations}
             onSwitchOrg={handleSwitchOrg}
             onExit={handleExit}
           />
@@ -64,55 +64,13 @@ export default function CustomerContextView({
           </Link>
         </div>
 
-        <div className={styles.headerRow}>
-          <h2>{view === "candidates" ? "Candidates" : "Jobs"}</h2>
-          <Button type="button" startIcon="+">
-            {view === "candidates" ? "Add Candidate" : "Create Job"}
-          </Button>
-        </div>
-
-        <InlineError message={customerContext.error} />
-        {customerContext.isLoading ? <div>Loading customer data...</div> : null}
-        {!customerContext.isLoading && view === "candidates" ? (
-          <div className={styles.kanban}>
-            {(customerContext.candidates?.stages ?? []).map((stage) => {
-              const cards = (
-                customerContext.candidates?.candidates ?? []
-              ).filter((candidate) => candidate.stage_id === stage.id);
-
-              return (
-                <div key={stage.id} className={styles.column}>
-                  <div className={styles.columnTitle}>{stage.name}</div>
-                  {cards.length === 0 ? (
-                    <div className={styles.card}>No candidates</div>
-                  ) : null}
-                  {cards.map((candidate) => (
-                    <div className={styles.card} key={candidate.id}>
-                      <strong>{candidate.name}</strong>
-                      <span>{candidate.job_title ?? "—"}</span>
-                      <span>{candidate.email ?? "—"}</span>
-                    </div>
-                  ))}
-                </div>
-              );
-            })}
+        {children ? (
+          children
+        ) : (
+          <div className={styles.emptyState}>
+            Select a view to manage this customer.
           </div>
-        ) : null}
-        {!customerContext.isLoading && view === "jobs" ? (
-          <div className={styles.jobsPlaceholder}>
-            {customerContext.jobs.length === 0 ? (
-              <div>No jobs yet.</div>
-            ) : (
-              customerContext.jobs.map((job) => (
-                <div key={job.id} className={styles.card}>
-                  <strong>{job.title}</strong>
-                  <span>{job.status ?? "—"}</span>
-                  <span>{job.created_at.slice(0, 10)}</span>
-                </div>
-              ))
-            )}
-          </div>
-        ) : null}
+        )}
       </div>
     </AdminShell>
   );

@@ -24,6 +24,16 @@
 .dragging {
   box-shadow: 0 12px 24px vars.$color-shadow;
   cursor: grabbing;
+  z-index: 1000;
+  position: relative;
+  opacity: 0;
+}
+
+.overlay {
+  box-shadow: 0 12px 24px vars.$color-shadow;
+  cursor: grabbing;
+  z-index: 1000;
+  position: relative;
 }
 
 .name {

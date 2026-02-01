@@ -8,9 +8,9 @@ import Modal from "@/shared/components/Modal/Modal";
 import SelectField from "@/shared/components/SelectField/SelectField";
 import InlineError from "@/shared/components/InlineError/InlineError";
 import {
-  createCandidate,
-  updateCandidate,
-} from "@/features/customerAts/services/customerAtsClient";
+  createCustomerAtsClient,
+  type AtsClient,
+} from "@/features/customerAts/services/atsClient";
 import type {
   CustomerCandidate,
   CustomerJob,
@@ -25,6 +25,7 @@ type AddCandidateModalProps = {
   jobs: CustomerJob[];
   stages: CustomerStage[];
   candidate?: CustomerCandidate | null;
+  client?: AtsClient;
 };
 
 export default function AddCandidateModal({
@@ -34,6 +35,7 @@ export default function AddCandidateModal({
   jobs,
   stages,
   candidate,
+  client,
 }: AddCandidateModalProps) {
   const [name, setName] = useState("");
   const [jobId, setJobId] = useState("");
@@ -42,6 +44,10 @@ export default function AddCandidateModal({
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const isEditing = Boolean(candidate);
+  const atsClient = useMemo(
+    () => client ?? createCustomerAtsClient(),
+    [client]
+  );
 
   const jobsById = useMemo(() => {
     return new Map(jobs.map((job) => [job.id, job]));
@@ -111,7 +117,7 @@ export default function AddCandidateModal({
     try {
       setIsSaving(true);
       if (candidate) {
-        await updateCandidate(candidate.id, {
+        await atsClient.updateCandidate(candidate.id, {
           name: name.trim(),
           jobId,
           email: email.trim() ? email.trim() : null,
@@ -122,7 +128,7 @@ export default function AddCandidateModal({
           setError("No pipeline stage available");
           return;
         }
-        await createCandidate({
+        await atsClient.createCandidate({
           name: name.trim(),
           jobId,
           email: email.trim() ? email.trim() : null,

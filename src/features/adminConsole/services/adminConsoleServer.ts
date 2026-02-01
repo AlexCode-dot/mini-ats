@@ -4,22 +4,19 @@ import {
   ADMIN_CONTEXT_BRAND,
   type AdminContext,
 } from "@/core/auth/requireAdminApi";
+// eslint-disable-next-line no-restricted-imports
 import {
   createAdmin as createAdminInternal,
   createOrganization as createOrganizationInternal,
   getOrganizationSummary as getOrganizationSummaryInternal,
   isAdminConsoleError,
   listAdmins as listAdminsInternal,
-  listOrganizationCandidates as listOrganizationCandidatesInternal,
-  listOrganizationJobs as listOrganizationJobsInternal,
   listOrganizations as listOrganizationsInternal,
   toggleOrganization as toggleOrganizationInternal,
   updateOrganizationCustomer as updateOrganizationCustomerInternal,
 } from "@/features/adminConsole/services/adminConsoleServer.internal";
 import type {
   AdminAdminRow,
-  AdminCandidatesResponse,
-  AdminJob,
   AdminOrgRow,
   AdminOrgSummary,
   CreateAdminPayload,
@@ -86,20 +83,6 @@ export const adminConsoleService = {
   ): Promise<AdminOrgSummary> {
     assertAdminContext(ctx);
     return getOrganizationSummaryInternal(orgId);
-  },
-  async listOrganizationCandidates(
-    ctx: AdminContext,
-    orgId: string
-  ): Promise<AdminCandidatesResponse> {
-    assertAdminContext(ctx);
-    return listOrganizationCandidatesInternal(orgId);
-  },
-  async listOrganizationJobs(
-    ctx: AdminContext,
-    orgId: string
-  ): Promise<AdminJob[]> {
-    assertAdminContext(ctx);
-    return listOrganizationJobsInternal(orgId);
   },
 };
 

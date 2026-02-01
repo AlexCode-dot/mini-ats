@@ -12,19 +12,13 @@ import Button from "@/shared/components/Button/Button";
 import TableCard from "@/shared/components/TableCard/TableCard";
 import Badge from "@/shared/components/Badge/Badge";
 import LinkButton from "@/shared/components/LinkButton/LinkButton";
-
-function formatDate(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toISOString().slice(0, 10);
-}
+import { formatDate } from "@/shared/utils/formatDate";
 
 export default function AdminDashboardView() {
-  const { organizations, isLoading, error, createOrganization } =
-    useAdminOrganizations();
+  const { state, data, actions } = useAdminOrganizations();
   const { createAdmin } = useAdminAdmins();
   const modals = useAdminModals();
-  const recent = organizations.slice(0, 5);
+  const recent = data.organizations.slice(0, 5);
 
   return (
     <AdminShell title="Dashboard">
@@ -67,12 +61,12 @@ export default function AdminDashboardView() {
 
         <TableCard title="Recent Customers">
           <div className={styles.mobileList}>
-            <InlineError message={error} />
+            <InlineError message={state.error} />
           </div>
-          {isLoading ? (
+          {state.isLoading ? (
             <div className={styles.mobileList}>Loading...</div>
           ) : null}
-          {!isLoading && !error ? (
+          {!state.isLoading && !state.error ? (
             <>
               <table className={styles.table}>
                 <thead>
@@ -133,7 +127,7 @@ export default function AdminDashboardView() {
       <CreateCustomerModal
         open={modals.isCreateCustomerOpen}
         onClose={modals.closeCreateCustomer}
-        onCreate={createOrganization}
+        onCreate={actions.createOrganization}
       />
       <CreateAdminModal
         open={modals.isCreateAdminOpen}

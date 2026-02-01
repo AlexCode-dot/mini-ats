@@ -1,59 +1,42 @@
 "use client";
-
-import { useMemo, useState } from "react";
-
 import AdminShell from "@/features/adminConsole/components/AdminShell/AdminShell";
 import CreateAdminModal from "@/features/adminConsole/components/CreateAdminModal/CreateAdminModal";
-import { useAdminAdmins } from "@/features/adminConsole/hooks/useAdminAdmins";
-import { useAdminModals } from "@/features/adminConsole/hooks/useAdminModals";
+import { useAdminAdminsView } from "@/features/adminConsole/hooks/useAdminAdminsView";
 import styles from "@/features/adminConsole/components/AdminAdminsView/AdminAdminsView.module.scss";
 import InlineError from "@/shared/components/InlineError/InlineError";
 import Button from "@/shared/components/Button/Button";
 import SearchInput from "@/shared/components/SearchInput/SearchInput";
 import TableCard from "@/shared/components/TableCard/TableCard";
-
-function formatDate(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toISOString().slice(0, 10);
-}
+import { formatDate } from "@/shared/utils/formatDate";
 
 export default function AdminAdminsView() {
-  const { admins, isLoading, error, createAdmin } = useAdminAdmins();
-  const modals = useAdminModals();
-  const [query, setQuery] = useState("");
-
-  const filtered = useMemo(() => {
-    const term = query.trim().toLowerCase();
-    if (!term) return admins;
-    return admins.filter((admin) => {
-      const name = admin.name?.toLowerCase() ?? "";
-      const email = admin.email?.toLowerCase() ?? "";
-      return name.includes(term) || email.includes(term);
-    });
-  }, [admins, query]);
+  const { state, filters, data, modals, actions } = useAdminAdminsView();
 
   return (
     <AdminShell title="Admin Users">
       <div className={styles.page}>
         <div className={styles.toolbar}>
           <SearchInput
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            value={filters.query}
+            onChange={(event) => filters.setQuery(event.target.value)}
             placeholder="Search admin..."
           />
-          <Button type="button" startIcon="+" onClick={modals.openCreateAdmin}>
+          <Button
+            type="button"
+            startIcon="+"
+            onClick={modals.adminModals.openCreateAdmin}
+          >
             Create Admin
           </Button>
         </div>
         <TableCard>
           <div className={styles.mobileList}>
-            <InlineError message={error} />
+            <InlineError message={state.error} />
           </div>
-          {isLoading ? (
+          {state.isLoading ? (
             <div className={styles.mobileList}>Loading...</div>
           ) : null}
-          {!isLoading && !error ? (
+          {!state.isLoading && !state.error ? (
             <>
               <table className={styles.table}>
                 <thead>
@@ -64,7 +47,7 @@ export default function AdminAdminsView() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((admin) => (
+                  {data.filtered.map((admin) => (
                     <tr key={admin.id}>
                       <td>{admin.name ?? "—"}</td>
                       <td>{admin.email ?? "—"}</td>
@@ -74,7 +57,7 @@ export default function AdminAdminsView() {
                 </tbody>
               </table>
               <div className={styles.mobileList}>
-                {filtered.map((admin) => (
+                {data.filtered.map((admin) => (
                   <div className={styles.card} key={admin.id}>
                     <div>{admin.name ?? "—"}</div>
                     <div>{admin.email ?? "—"}</div>
@@ -88,9 +71,9 @@ export default function AdminAdminsView() {
       </div>
 
       <CreateAdminModal
-        open={modals.isCreateAdminOpen}
-        onClose={modals.closeCreateAdmin}
-        onCreate={createAdmin}
+        open={modals.adminModals.isCreateAdminOpen}
+        onClose={modals.adminModals.closeCreateAdmin}
+        onCreate={actions.createAdmin}
       />
     </AdminShell>
   );

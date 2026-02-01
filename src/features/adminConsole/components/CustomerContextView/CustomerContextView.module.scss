@@ -2,8 +2,17 @@
 @use "shared/styles/mixins" as mixins;
 
 .page {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  height: calc(100vh - 74px - 50px);
+  height: calc(100dvh - 74px - 50px);
+  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .tabs {
@@ -25,43 +34,15 @@
   border-bottom-color: vars.$color-primary-strong;
 }
 
-.headerRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.kanban {
-  display: grid;
-  grid-auto-flow: column;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 12px;
-}
-
-.column {
-  min-width: 220px;
-  @include mixins.card(vars.$space-3);
-}
-
-.columnTitle {
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-.card {
-  border: 1px solid vars.$color-border;
-  border-radius: vars.$radius-md;
-  padding: 10px;
-  display: grid;
-  gap: 4px;
-  font-size: 13px;
-  color: vars.$color-text-muted;
-}
-
-.jobsPlaceholder {
+.emptyState {
   @include mixins.card(vars.$space-4);
-  display: grid;
-  gap: 8px;
+  color: vars.$color-text-muted;
+  font-size: 14px;
+}
+
+@media (max-width: 960px) {
+  .page {
+    height: calc(100vh - 74px - 40px - 80px);
+    height: calc(100dvh - 74px - 40px - 80px);
+  }
 }

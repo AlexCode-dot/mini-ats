@@ -2,17 +2,14 @@ import { NextResponse } from "next/server";
 
 import { requireAdminApi, isAdminApiError } from "@/core/auth/requireAdminApi";
 import { isUuid } from "@/core/validation/isUuid";
-import {
-  adminConsoleService,
-  isAdminConsoleError,
-} from "@/features/adminConsole/services/adminConsoleServer";
+import { getOrgNameForAdmin } from "@/features/customerAts/services/adminAtsServer";
 
 export async function GET(
   request: Request,
   context: { params: Promise<{ orgId: string }> }
 ) {
   try {
-    const ctx = await requireAdminApi();
+    await requireAdminApi();
     const { orgId } = await context.params;
 
     if (!orgId) {
@@ -23,22 +20,14 @@ export async function GET(
       return NextResponse.json({ error: "Invalid orgId" }, { status: 400 });
     }
 
-    const data = await adminConsoleService.listOrganizationJobs(ctx, orgId);
-    return NextResponse.json(data);
+    const name = await getOrgNameForAdmin(orgId);
+    return NextResponse.json(name);
   } catch (error) {
     if (isAdminApiError(error)) {
       return NextResponse.json(
         { error: error.message },
         { status: error.status }
       );
-    }
-
-    if (isAdminConsoleError(error)) {
-      const message =
-        process.env.NODE_ENV === "production"
-          ? "Operation failed"
-          : error.message;
-      return NextResponse.json({ error: message }, { status: error.status });
     }
 
     return NextResponse.json({ error: "Server error" }, { status: 500 });

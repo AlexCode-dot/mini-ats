@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 import {
   createOrganization,
@@ -16,7 +17,36 @@ import type {
   UpdateOrganizationResponse,
 } from "@/features/adminConsole/types";
 
-export function useAdminOrganizations() {
+export type AdminOrganizationsState = {
+  isLoading: boolean;
+  error: string | null;
+  actionError: string | null;
+  savingOrgIds: string[];
+};
+
+export type AdminOrganizationsData = {
+  organizations: AdminOrgRow[];
+};
+
+export type AdminOrganizationsActions = {
+  refresh: () => Promise<void>;
+  createOrganization: (
+    payload: CreateOrganizationPayload
+  ) => Promise<CreateOrganizationResponse>;
+  toggleOrganization: (orgId: string, isActive: boolean) => Promise<void>;
+  updateOrganization: (
+    payload: UpdateOrganizationPayload
+  ) => Promise<UpdateOrganizationResponse>;
+  setOrganizations: Dispatch<SetStateAction<AdminOrgRow[]>>;
+};
+
+export type AdminOrganizations = {
+  state: AdminOrganizationsState;
+  data: AdminOrganizationsData;
+  actions: AdminOrganizationsActions;
+};
+
+export function useAdminOrganizations(): AdminOrganizations {
   const [organizations, setOrganizations] = useState<AdminOrgRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -109,15 +139,21 @@ export function useAdminOrganizations() {
   );
 
   return {
-    organizations,
-    isLoading,
-    error,
-    actionError,
-    savingOrgIds,
-    refresh: loadOrganizations,
-    createOrganization: handleCreate,
-    toggleOrganization: handleToggle,
-    updateOrganization: handleUpdate,
-    setOrganizations,
+    state: {
+      isLoading,
+      error,
+      actionError,
+      savingOrgIds,
+    },
+    data: {
+      organizations,
+    },
+    actions: {
+      refresh: loadOrganizations,
+      createOrganization: handleCreate,
+      toggleOrganization: handleToggle,
+      updateOrganization: handleUpdate,
+      setOrganizations,
+    },
   };
 }
