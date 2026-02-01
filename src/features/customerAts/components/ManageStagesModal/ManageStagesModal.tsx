@@ -22,10 +22,9 @@ import InlineError from "@/shared/components/InlineError/InlineError";
 import Modal from "@/shared/components/Modal/Modal";
 import ConfirmDialog from "@/shared/components/ConfirmDialog/ConfirmDialog";
 import {
-  createStages,
-  deleteStageWithCandidates,
-  updateStages,
-} from "@/features/customerAts/services/customerAtsClient";
+  createCustomerAtsClient,
+  type AtsClient,
+} from "@/features/customerAts/services/atsClient";
 import type { CustomerStage, StageDraft } from "@/features/customerAts/types";
 import styles from "@/features/customerAts/components/ManageStagesModal/ManageStagesModal.module.scss";
 
@@ -35,6 +34,7 @@ type ManageStagesModalProps = {
   onSaved: () => void;
   stages: CustomerStage[];
   candidateCounts?: Record<string, number>;
+  client?: AtsClient;
 };
 
 function SortableStageRow({
@@ -98,6 +98,7 @@ export default function ManageStagesModal({
   onSaved,
   stages,
   candidateCounts,
+  client,
 }: ManageStagesModalProps) {
   const [drafts, setDrafts] = useState<StageDraft[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -106,6 +107,10 @@ export default function ManageStagesModal({
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingDeleteCount, setPendingDeleteCount] = useState(0);
   const [pendingDeleteFallback, setPendingDeleteFallback] = useState("");
+  const atsClient = useMemo(
+    () => client ?? createCustomerAtsClient(),
+    [client]
+  );
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -187,12 +192,15 @@ export default function ManageStagesModal({
 
     try {
       setIsDeleting(true);
-      await deleteStageWithCandidates(pendingDeleteId, fallbackStage.id);
+      await atsClient.deleteStageWithCandidates(
+        pendingDeleteId,
+        fallbackStage.id
+      );
       const normalizedRemaining = remaining
         .filter((stage) => !stage.isNew)
         .sort((a, b) => a.position - b.position)
         .map((stage, index) => ({ ...stage, position: index + 1 }));
-      await updateStages(normalizedRemaining as CustomerStage[]);
+      await atsClient.updateStages(normalizedRemaining as CustomerStage[]);
       setDrafts(normalizedRemaining);
       onSaved();
       onClose();
@@ -258,16 +266,16 @@ export default function ManageStagesModal({
     try {
       setIsSaving(true);
       for (const stage of deletedStages) {
-        await deleteStageWithCandidates(stage.id, fallbackStage.id);
+        await atsClient.deleteStageWithCandidates(stage.id, fallbackStage.id);
       }
-      const createdStages = await createStages(newStages);
+      const createdStages = await atsClient.createStages(newStages);
       const createdWithPositions = createdStages.map((stage, index) => ({
         ...stage,
         position: newStages[index]?.position ?? stage.position,
         name: newStages[index]?.name ?? stage.name,
         is_terminal: newStages[index]?.is_terminal ?? stage.is_terminal,
       }));
-      await updateStages([
+      await atsClient.updateStages([
         ...existingStages,
         ...createdWithPositions,
       ] as CustomerStage[]);

@@ -1,18 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import Badge from "@/shared/components/Badge/Badge";
 import Button from "@/shared/components/Button/Button";
 import Modal from "@/shared/components/Modal/Modal";
+import ActionMenu from "@/shared/components/ActionMenu/ActionMenu";
 import type { CustomerJob } from "@/features/customerAts/types";
+import { formatDate } from "@/shared/utils/formatDate";
+import { normalizeJobLink } from "@/shared/utils/urlHelpers";
 import styles from "@/features/customerAts/components/JobDetailsModal/JobDetailsModal.module.scss";
-
-function formatDate(value: string) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toISOString().slice(0, 10);
-}
 
 type JobDetailsModalProps = {
   open: boolean;
@@ -31,65 +26,19 @@ export default function JobDetailsModal({
 }: JobDetailsModalProps) {
   if (!job) return null;
   const statusVariant = job.status === "closed" ? "inactive" : "active";
-  const link =
-    job.job_url && /^https?:\/\//i.test(job.job_url) ? job.job_url : null;
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const handleClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (target?.closest('[data-job-details-menu="true"]')) {
-        return;
-      }
-      setMenuOpen(false);
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [menuOpen]);
+  const link = normalizeJobLink(job.job_url);
 
   return (
     <Modal open={open} onClose={onClose}>
       <div className={styles.headerRow}>
         <h3 className={styles.title}>Job details</h3>
-        <div className={styles.menu} data-job-details-menu="true">
-          <button
-            type="button"
-            className={styles.menuButton}
-            onClick={() => setMenuOpen((prev) => !prev)}
-            aria-label="Job actions"
-          >
-            ⋯
-          </button>
-          {menuOpen ? (
-            <div className={styles.menuDropdown}>
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  onEdit(job);
-                }}
-                className={styles.menuItem}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  onDelete(job);
-                }}
-                className={styles.menuItem}
-              >
-                Delete
-              </Button>
-            </div>
-          ) : null}
-        </div>
+        <ActionMenu
+          items={[
+            { label: "Edit", onClick: () => onEdit(job) },
+            { label: "Delete", onClick: () => onDelete(job) },
+          ]}
+          ariaLabel="Job actions"
+        />
       </div>
       <div className={styles.body}>
         <div className={styles.row}>

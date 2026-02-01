@@ -10,12 +10,16 @@ import styles from "@/features/customerAts/components/CustomerShell/CustomerShel
 type CustomerShellProps = {
   orgName: string;
   children: ReactNode;
+  basePath?: string;
+  contextLabel?: string;
 };
 
-const mobileTabs = [
-  { href: "/candidates", label: "Candidates", icon: "users" },
-  { href: "/jobs", label: "Jobs", icon: "briefcase" },
-];
+function getTabs(basePath: string) {
+  return [
+    { href: `${basePath}/candidates`, label: "Candidates", icon: "users" },
+    { href: `${basePath}/jobs`, label: "Jobs", icon: "briefcase" },
+  ];
+}
 
 function IconUsers() {
   return (
@@ -61,34 +65,39 @@ function getIcon(name: string) {
 export default function CustomerShell({
   orgName,
   children,
+  basePath = "",
+  contextLabel,
 }: CustomerShellProps) {
   const pathname = usePathname();
+  const tabs = getTabs(basePath || "");
 
   return (
     <div className={styles.shell}>
       <header className={styles.header}>
         <div className={styles.brandRow}>
-          <div className={styles.orgName}>{orgName}</div>
+          <div>
+            <div className={styles.orgName}>{orgName}</div>
+            {contextLabel ? (
+              <div className={styles.contextLabel}>{contextLabel}</div>
+            ) : null}
+          </div>
           <nav className={styles.tabs}>
-            <Link
-              className={`${styles.tabLink} ${pathname === "/candidates" ? styles.tabActive : ""}`}
-              href="/candidates"
-            >
-              Candidates
-            </Link>
-            <Link
-              className={`${styles.tabLink} ${pathname === "/jobs" ? styles.tabActive : ""}`}
-              href="/jobs"
-            >
-              Jobs
-            </Link>
+            {tabs.map((tab) => (
+              <Link
+                key={tab.href}
+                className={`${styles.tabLink} ${pathname === tab.href ? styles.tabActive : ""}`}
+                href={tab.href}
+              >
+                {tab.label}
+              </Link>
+            ))}
           </nav>
         </div>
         <CustomerUserMenu />
       </header>
       <main className={styles.content}>{children}</main>
       <nav className={styles.mobileTabs}>
-        {mobileTabs.map((tab) => {
+        {tabs.map((tab) => {
           const isActive = pathname === tab.href;
           return (
             <Link

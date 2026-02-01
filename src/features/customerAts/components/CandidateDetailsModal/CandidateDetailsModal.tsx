@@ -1,17 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import Badge from "@/shared/components/Badge/Badge";
 import Button from "@/shared/components/Button/Button";
 import Modal from "@/shared/components/Modal/Modal";
+import ActionMenu from "@/shared/components/ActionMenu/ActionMenu";
 import type { CustomerCandidate } from "@/features/customerAts/types";
+import { isHttpUrl } from "@/shared/utils/urlHelpers";
 import styles from "@/features/customerAts/components/CandidateDetailsModal/CandidateDetailsModal.module.scss";
-
-function isHttpUrl(value: string | null) {
-  if (!value) return false;
-  return /^https?:\/\//i.test(value);
-}
 
 type CandidateDetailsModalProps = {
   open: boolean;
@@ -28,69 +23,19 @@ export default function CandidateDetailsModal({
   onEdit,
   onArchive,
 }: CandidateDetailsModalProps) {
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    if (!candidate) {
-      setMenuOpen(false);
-      return;
-    }
-    if (!menuOpen) return;
-    const handleClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (target?.closest('[data-candidate-details-menu="true"]')) {
-        return;
-      }
-      setMenuOpen(false);
-    };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [menuOpen]);
-
   if (!candidate) return null;
 
   return (
     <Modal open={open} onClose={onClose}>
       <div className={styles.headerRow}>
         <h3 className={styles.title}>Candidate details</h3>
-        <div className={styles.menu} data-candidate-details-menu="true">
-          <button
-            type="button"
-            className={styles.menuButton}
-            onClick={() => setMenuOpen((prev) => !prev)}
-            aria-label="Candidate actions"
-          >
-            ⋯
-          </button>
-          {menuOpen ? (
-            <div className={styles.menuDropdown}>
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  onEdit(candidate);
-                }}
-                className={styles.menuItem}
-              >
-                Edit
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-                  onArchive(candidate);
-                }}
-                className={styles.menuItem}
-              >
-                Archive
-              </Button>
-            </div>
-          ) : null}
-        </div>
+        <ActionMenu
+          items={[
+            { label: "Edit", onClick: () => onEdit(candidate) },
+            { label: "Archive", onClick: () => onArchive(candidate) },
+          ]}
+          ariaLabel="Candidate actions"
+        />
       </div>
 
       <div className={styles.body}>
