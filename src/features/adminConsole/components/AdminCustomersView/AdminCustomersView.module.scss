@@ -23,6 +23,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  overflow: visible;
 }
 
 .table th,
@@ -32,6 +33,7 @@
   border-top: 1px solid vars.$color-border;
   font-size: 14px;
   color: vars.$color-text-muted;
+  overflow: visible;
 }
 
 .table th:nth-child(4),
@@ -58,44 +60,6 @@
   gap: 10px;
   flex-wrap: wrap;
   justify-content: center;
-}
-
-.menu {
-  position: relative;
-}
-
-.menuButton {
-  border: 1px solid vars.$color-border-strong;
-  background: vars.$color-surface;
-  color: vars.$color-text;
-  padding: 4px 16px;
-  border-radius: 999px;
-  font-size: 16px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.menuDropdown {
-  position: absolute;
-  right: 0;
-  top: 36px;
-  min-width: 140px;
-  background: vars.$color-surface;
-  border: 1px solid vars.$color-border;
-  border-radius: 12px;
-  padding: 6px;
-  box-shadow: 0 16px 30px vars.$color-shadow-strong;
-  z-index: 5;
-}
-
-.menuItem {
-  width: 100%;
-  justify-content: flex-start;
-}
-
-.menuItem:disabled {
-  color: vars.$color-text-muted;
-  cursor: not-allowed;
 }
 
 .saving {

@@ -106,7 +106,7 @@ export default function AdminShell({
   return (
     <div className={styles.shell}>
       <AdminSidebar />
-      <div>
+      <div className={styles.mainColumn}>
         <header className={styles.topbar}>
           <div className={styles.topbarLeft}>
             <div className={styles.title}>{title}</div>
