@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import styles from "@/shared/components/PasswordField/PasswordField.module.scss";
 
@@ -24,6 +24,16 @@ export default function PasswordField({
   required = false,
 }: PasswordFieldProps) {
   const [error, setError] = useState<string | null>(null);
+  const [isCopied, setIsCopied] = useState(false);
+  const copyTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current !== null) {
+        window.clearTimeout(copyTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <label className={styles.field}>
@@ -58,10 +68,17 @@ export default function PasswordField({
           onClick={() => {
             if (value) {
               onCopy?.(value);
+              setIsCopied(true);
+              if (copyTimeoutRef.current !== null) {
+                window.clearTimeout(copyTimeoutRef.current);
+              }
+              copyTimeoutRef.current = window.setTimeout(() => {
+                setIsCopied(false);
+              }, 2000);
             }
           }}
         >
-          Copy
+          {isCopied ? "Copied" : "Copy"}
         </button>
       </div>
       {hint ? <span className={styles.hint}>{hint}</span> : null}
