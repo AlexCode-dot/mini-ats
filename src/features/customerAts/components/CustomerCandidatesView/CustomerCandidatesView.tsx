@@ -253,6 +253,7 @@ export default function CustomerCandidatesView({
         stages={data.stages}
         candidate={modals.editingCandidate}
         client={client}
+        orgId={orgId}
       />
       <CandidateDetailsModal
         open={Boolean(modals.detailsCandidate)}

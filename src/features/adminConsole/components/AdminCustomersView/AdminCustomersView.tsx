@@ -42,7 +42,22 @@ export default function AdminCustomersView() {
           {state.isLoading ? (
             <div className={styles.mobileList}>Loading...</div>
           ) : null}
-          {!state.isLoading && !state.error ? (
+          {!state.isLoading && !state.error && data.filtered.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyTitle}>No customers yet</div>
+              <div className={styles.emptyText}>
+                Create your first customer to start managing jobs and candidates.
+              </div>
+              <Button
+                type="button"
+                startIcon="+"
+                onClick={modals.adminModals.openCreateCustomer}
+              >
+                Create Customer
+              </Button>
+            </div>
+          ) : null}
+          {!state.isLoading && !state.error && data.filtered.length > 0 ? (
             <>
               <table className={styles.table}>
                 <thead>

@@ -33,6 +33,8 @@
 - name (text)
 - email (text, nullable)
 - linkedin_url (text, nullable)
+- resume_url (text, nullable)
+- note (text, nullable)
 - stage_id (uuid, fk → pipeline_stages.id)
 - is_archived (boolean, default false)
 - created_at (timestamp)
@@ -50,4 +52,4 @@
 
 - candidates(org_id)
 - candidates(org_id, job_id)
-- candidates(org_id, stage)
+- candidates(org_id, stage_id)

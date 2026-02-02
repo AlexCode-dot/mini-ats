@@ -10,9 +10,12 @@ export type CustomerCandidate = {
   name: string;
   email: string | null;
   linkedin_url: string | null;
+  resume_url: string | null;
+  note: string | null;
   stage_id: string;
   job_id: string | null;
   job_title: string | null;
+  job_status: string | null;
 };
 
 export type CustomerJob = {
@@ -40,6 +43,8 @@ export type CreateCandidatePayload = {
   jobId: string;
   email?: string | null;
   linkedinUrl?: string | null;
+  resumeUrl?: string | null;
+  note?: string | null;
   stageId: string;
 };
 
@@ -48,6 +53,8 @@ export type UpdateCandidatePayload = {
   jobId: string;
   email?: string | null;
   linkedinUrl?: string | null;
+  resumeUrl?: string | null;
+  note?: string | null;
 };
 
 export type StageDraft = CustomerStage & {

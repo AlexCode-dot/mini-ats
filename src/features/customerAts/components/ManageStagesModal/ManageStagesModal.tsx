@@ -243,8 +243,8 @@ export default function ManageStagesModal({
     }
 
     const normalized = remaining
-      .map((stage, index) => ({ ...stage, position: index + 1 }))
-      .map((stage) => ({ ...stage, name: stage.name.trim() }));
+      .map((stage) => ({ ...stage, name: stage.name.trim() }))
+      .map((stage, index) => ({ ...stage, position: index + 1 }));
 
     if (normalized.some((stage) => !stage.name)) {
       setError("Stage name cannot be empty");
@@ -275,10 +275,12 @@ export default function ManageStagesModal({
         name: newStages[index]?.name ?? stage.name,
         is_terminal: newStages[index]?.is_terminal ?? stage.is_terminal,
       }));
-      await atsClient.updateStages([
-        ...existingStages,
-        ...createdWithPositions,
-      ] as CustomerStage[]);
+
+      const merged = [...existingStages, ...createdWithPositions]
+        .sort((a, b) => a.position - b.position)
+        .map((stage, index) => ({ ...stage, position: index + 1 }));
+
+      await atsClient.updateStages(merged as CustomerStage[]);
       onSaved();
       onClose();
     } catch (err) {

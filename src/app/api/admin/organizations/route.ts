@@ -43,9 +43,9 @@ export async function POST(request: Request) {
     const ctx = await requireAdminMutation(request);
     const body = (await request.json()) as CreateOrganizationPayload;
 
-    if (!body.orgName || !body.customerEmail || !body.password) {
+    if (!body.orgName || !body.customerEmail) {
       return NextResponse.json(
-        { error: "orgName, customerEmail, and password are required" },
+        { error: "orgName and customerEmail are required" },
         { status: 400 }
       );
     }
@@ -57,16 +57,31 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!isPasswordStrong(body.password)) {
-      return NextResponse.json(
-        {
-          error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
-        },
-        { status: 400 }
-      );
+    if (!body.sendInvite) {
+      if (!body.password) {
+        return NextResponse.json(
+          { error: "password is required unless sending invite" },
+          { status: 400 }
+        );
+      }
+      if (!isPasswordStrong(body.password)) {
+        return NextResponse.json(
+          {
+            error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
+          },
+          { status: 400 }
+        );
+      }
     }
 
-    const result = await adminConsoleService.createOrganization(ctx, body);
+    const origin =
+      request.headers.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "";
+    const inviteRedirectTo = origin ? `${origin}/reset-password` : undefined;
+
+    const result = await adminConsoleService.createOrganization(ctx, {
+      ...body,
+      inviteRedirectTo,
+    });
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     if (isAdminApiError(error)) {

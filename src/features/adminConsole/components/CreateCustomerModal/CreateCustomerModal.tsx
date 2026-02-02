@@ -22,13 +22,16 @@ type CreateCustomerModalProps = {
 };
 
 function generatePassword() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
+  const cryptoObj =
+    typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
+
+  if (cryptoObj?.randomUUID) {
+    return cryptoObj.randomUUID();
   }
 
-  if (typeof crypto !== "undefined" && "getRandomValues" in crypto) {
+  if (cryptoObj?.getRandomValues) {
     const buffer = new Uint32Array(4);
-    crypto.getRandomValues(buffer);
+    cryptoObj.getRandomValues(buffer);
     return Array.from(buffer, (value) => value.toString(36)).join("");
   }
 
@@ -44,21 +47,43 @@ export default function CreateCustomerModal({
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [password, setPassword] = useState("");
+  const [sendInvite, setSendInvite] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [createdPassword, setCreatedPassword] = useState<string | null>(null);
+  const [inviteLink, setInviteLink] = useState<string | null>(null);
+  const [isPasswordCopied, setIsPasswordCopied] = useState(false);
+  const [isInviteCopied, setIsInviteCopied] = useState(false);
   const formId = "create-customer-form";
 
   const handleClose = () => {
     setIsSuccess(false);
     setError(null);
     setCreatedPassword(null);
+    setInviteLink(null);
+    setIsPasswordCopied(false);
+    setIsInviteCopied(false);
     setOrgName("");
     setCustomerEmail("");
     setCustomerName("");
     setPassword("");
+    setSendInvite(false);
     onClose();
+  };
+
+  const handleCopyInvite = async () => {
+    if (!inviteLink) return;
+    await navigator.clipboard?.writeText(inviteLink);
+    setIsInviteCopied(true);
+    window.setTimeout(() => setIsInviteCopied(false), 2000);
+  };
+
+  const handleCopyPassword = async () => {
+    if (!createdPassword) return;
+    await navigator.clipboard?.writeText(createdPassword);
+    setIsPasswordCopied(true);
+    window.setTimeout(() => setIsPasswordCopied(false), 2000);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -67,17 +92,20 @@ export default function CreateCustomerModal({
     setError(null);
     setIsSuccess(false);
     setCreatedPassword(null);
+    setInviteLink(null);
 
     try {
       const payload: CreateOrganizationPayload = {
         orgName,
         customerEmail,
         customerName: customerName || undefined,
-        password,
+        ...(sendInvite ? {} : { password }),
+        sendInvite,
       };
-      await onCreate(payload);
+      const result = await onCreate(payload);
       setIsSuccess(true);
-      setCreatedPassword(password);
+      setCreatedPassword(sendInvite ? null : password);
+      setInviteLink(result.inviteLink ?? null);
       setPassword("");
     } catch (err) {
       const message =
@@ -96,18 +124,27 @@ export default function CreateCustomerModal({
       footer={
         isSuccess ? (
           <>
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() =>
-                createdPassword
-                  ? void navigator.clipboard?.writeText(createdPassword)
-                  : null
-              }
-            >
-              Copy password
-            </Button>
+            {sendInvite ? (
+              inviteLink ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleCopyInvite}
+                >
+                  {isInviteCopied ? "Invite copied" : "Copy invite link"}
+                </Button>
+              ) : null
+            ) : (
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={handleCopyPassword}
+              >
+                {isPasswordCopied ? "Password copied" : "Copy password"}
+              </Button>
+            )}
             <Button type="button" onClick={handleClose}>
               Close
             </Button>
@@ -127,9 +164,26 @@ export default function CreateCustomerModal({
       {isSuccess ? (
         <div className={styles.notice}>
           <div>Email: {customerEmail}</div>
-          <div>
-            Password: <strong>••••••••</strong>
-          </div>
+          {sendInvite ? (
+            <div className={styles.noticeSubtext}>
+              Invite sent. The customer can set a password from the email.
+            </div>
+          ) : (
+            <div>
+              Password: <strong>••••••••</strong>
+            </div>
+          )}
+          {sendInvite && inviteLink ? (
+            <div className={styles.inviteRow}>
+              <button
+                type="button"
+                className={styles.inviteButton}
+                onClick={handleCopyInvite}
+              >
+                {isInviteCopied ? "Invite copied" : "Copy invite link"}
+              </button>
+            </div>
+          ) : null}
         </div>
       ) : (
         <form id={formId} className={styles.form} onSubmit={handleSubmit}>
@@ -151,16 +205,38 @@ export default function CreateCustomerModal({
             value={customerName}
             onChange={(event) => setCustomerName(event.target.value)}
           />
-          <PasswordField
-            label="Password"
-            value={password}
-            onChange={setPassword}
-            onGenerate={generatePassword}
-            onCopy={(value) => void navigator.clipboard?.writeText(value)}
-            hint={`Minimum ${MIN_PASSWORD_LENGTH} characters.`}
-            error={error}
-            required
-          />
+          <div className={styles.inviteToggle}>
+            <label className={styles.inviteLabel}>
+              <input
+                type="checkbox"
+                checked={sendInvite}
+                onChange={(event) => {
+                  const next = event.target.checked;
+                  setSendInvite(next);
+                  if (next) {
+                    setPassword("");
+                  }
+                }}
+              />
+              Generate invite link instead of setting a password
+            </label>
+            <div className={styles.inviteHint}>
+              Generates a secure invite link for the customer to set their
+              password.
+            </div>
+          </div>
+          {!sendInvite ? (
+            <PasswordField
+              label="Password"
+              value={password}
+              onChange={setPassword}
+              onGenerate={generatePassword}
+              onCopy={(value) => void navigator.clipboard?.writeText(value)}
+              hint={`Minimum ${MIN_PASSWORD_LENGTH} characters.`}
+              error={error}
+              required
+            />
+          ) : null}
         </form>
       )}
     </Modal>

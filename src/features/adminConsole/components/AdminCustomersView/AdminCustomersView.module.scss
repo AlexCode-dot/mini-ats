@@ -95,6 +95,25 @@
   display: none !important;
 }
 
+.emptyState {
+  padding: 28px 20px;
+  text-align: center;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  color: vars.$color-text-muted;
+}
+
+.emptyTitle {
+  color: vars.$color-text;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.emptyText {
+  font-size: 14px;
+}
+
 @media (max-width: 860px) {
   .table {
     display: none;

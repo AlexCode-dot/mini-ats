@@ -11,6 +11,7 @@ import type {
   CreateAdminPayload,
   CreateAdminResponse,
 } from "@/features/adminConsole/types";
+import { toUserMessage } from "@/shared/errors/toUserMessage";
 
 export function useAdminAdmins() {
   const [admins, setAdmins] = useState<AdminAdminRow[]>([]);
@@ -25,8 +26,7 @@ export function useAdminAdmins() {
       const data = await fetchAdmins();
       setAdmins(data);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load";
-      setError(message);
+      setError(toUserMessage(err, "Unable to load admins."));
     } finally {
       setIsLoading(false);
     }

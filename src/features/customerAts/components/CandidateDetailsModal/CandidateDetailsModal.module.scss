@@ -36,6 +36,32 @@
   font-weight: 600;
 }
 
+.jobRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.closedBadge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: vars.$color-warning-text;
+  border: 1px solid vars.$color-warning-border;
+  border-radius: vars.$radius-pill;
+  padding: 2px 8px;
+  background: vars.$color-warning-surface;
+}
+
+.valueMultiline {
+  font-size: 15px;
+  color: vars.$color-text;
+  font-weight: 500;
+  white-space: pre-wrap;
+}
+
 .valueMuted {
   font-size: 14px;
   color: vars.$color-text-muted;

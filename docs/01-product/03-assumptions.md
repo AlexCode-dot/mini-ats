@@ -92,6 +92,10 @@ Admins create customer accounts directly from the admin interface.
 - Avoids building invitation or self-signup flows
 - Fits a controlled first-customer rollout
 
+**Note (invites)**  
+For this assignment, the “invite customer” flow generates a secure invite link in the UI.
+Admins share the link manually during demo/onboarding (no SMTP setup required).
+
 ---
 
 ## 6. Candidate Filtering Strategy
@@ -137,6 +141,8 @@ Limit candidate profiles to:
 - Name
 - Email (optional)
 - LinkedIn URL (optional)
+- Resume (PDF, optional)
+- Internal note (optional)
 
 **Why**
 
@@ -168,7 +174,7 @@ Per-job pipelines, conditional stages, and historical pipeline versions are out 
 
 To prevent accidental data loss, destructive actions in the MVP use soft deletion or status-based removal rather than hard deletes.
 
-Jobs are closed rather than deleted.
+Jobs can be closed or deleted; deletions are guarded with a warning when candidates exist.
 Candidates can be archived.
 Pipeline stages can only be removed if they are empty or after reassignment.
 Archived candidates can be purged later with a scheduled cleanup (out of scope for the MVP).

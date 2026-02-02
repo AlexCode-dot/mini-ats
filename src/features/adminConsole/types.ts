@@ -22,7 +22,9 @@ export type CreateOrganizationPayload = {
   orgName: string;
   customerEmail: string;
   customerName?: string;
-  password: string;
+  password?: string;
+  sendInvite?: boolean;
+  inviteRedirectTo?: string;
 };
 
 export type CreateOrganizationResponse = {
@@ -33,6 +35,7 @@ export type CreateOrganizationResponse = {
     full_name: string | null;
     org_id: string;
   };
+  inviteLink?: string | null;
 };
 
 export type CreateAdminPayload = {

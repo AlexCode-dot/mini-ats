@@ -14,6 +14,14 @@ export async function signInWithPassword(email: string, password: string) {
   });
 }
 
+export async function requestPasswordReset(email: string, redirectTo?: string) {
+  const supabase = createBrowserSupabaseClient();
+
+  return supabase.auth.resetPasswordForEmail(email, {
+    ...(redirectTo ? { redirectTo } : {}),
+  });
+}
+
 export async function fetchUserRole(userId: string): Promise<LoginResult> {
   const supabase = createBrowserSupabaseClient();
 

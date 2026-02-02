@@ -7,6 +7,7 @@ import FormField from "@/shared/components/FormField/FormField";
 import Modal from "@/shared/components/Modal/Modal";
 import SelectField from "@/shared/components/SelectField/SelectField";
 import InlineError from "@/shared/components/InlineError/InlineError";
+import { toUserMessage } from "@/shared/errors/toUserMessage";
 import type { CustomerJob } from "@/features/customerAts/types";
 import styles from "@/features/customerAts/components/JobModal/JobModal.module.scss";
 
@@ -75,7 +76,7 @@ export default function JobModal({
       });
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save job");
+      setError(toUserMessage(err, "Failed to save job."));
     } finally {
       setIsSaving(false);
     }

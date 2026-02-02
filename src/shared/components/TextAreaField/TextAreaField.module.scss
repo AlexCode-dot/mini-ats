@@ -1,0 +1,16 @@
+@use "../../styles/variables" as vars;
+@use "../../styles/mixins" as mixins;
+
+.field {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  color: vars.$color-text-muted;
+}
+
+.field textarea {
+  @include mixins.input;
+  min-height: 120px;
+  resize: vertical;
+  font-family: inherit;
+}

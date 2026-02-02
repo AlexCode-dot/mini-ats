@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import type { AtsClient } from "@/features/customerAts/services/atsClient";
+import { toUserMessage } from "@/shared/errors/toUserMessage";
 
 export function useAtsOrgName(client: AtsClient) {
   const [orgName, setOrgName] = useState<string>("Organization");
@@ -19,9 +20,7 @@ export function useAtsOrgName(client: AtsClient) {
         }
       } catch (err) {
         if (!isMounted) return;
-        setError(
-          err instanceof Error ? err.message : "Failed to load organization"
-        );
+        setError(toUserMessage(err, "Unable to load organization."));
       }
     };
 

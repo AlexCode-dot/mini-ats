@@ -16,7 +16,7 @@ import { formatDate } from "@/shared/utils/formatDate";
 
 export default function AdminDashboardView() {
   const { state, data, actions } = useAdminOrganizations();
-  const { createAdmin } = useAdminAdmins();
+  const { admins, createAdmin } = useAdminAdmins();
   const modals = useAdminModals();
   const recent = data.organizations.slice(0, 5);
 
@@ -45,15 +45,17 @@ export default function AdminDashboardView() {
             </div>
           </div>
           <div className={styles.card}>
-            <div className={styles.cardTitle}>System Status</div>
-            <div className={styles.statusList}>
-              <div className={styles.statusItem}>
-                <span className={styles.statusIcon}>✓</span>
-                Supabase connected
+            <div className={styles.cardTitle}>Overview</div>
+            <div className={styles.metricGrid}>
+              <div className={styles.metricCard}>
+                <div className={styles.metricLabel}>Customers</div>
+                <div className={styles.metricValue}>
+                  {data.organizations.length}
+                </div>
               </div>
-              <div className={styles.statusItem}>
-                <span className={styles.statusIcon}>✓</span>
-                RLS enabled
+              <div className={styles.metricCard}>
+                <div className={styles.metricLabel}>Admins</div>
+                <div className={styles.metricValue}>{admins.length}</div>
               </div>
             </div>
           </div>
@@ -66,7 +68,18 @@ export default function AdminDashboardView() {
           {state.isLoading ? (
             <div className={styles.mobileList}>Loading...</div>
           ) : null}
-          {!state.isLoading && !state.error ? (
+          {!state.isLoading && !state.error && recent.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyTitle}>No customers yet</div>
+              <div className={styles.emptyText}>
+                Create a customer to see activity here.
+              </div>
+              <Button type="button" startIcon="+" onClick={modals.openCreateCustomer}>
+                Create Customer
+              </Button>
+            </div>
+          ) : null}
+          {!state.isLoading && !state.error && recent.length > 0 ? (
             <>
               <table className={styles.table}>
                 <thead>

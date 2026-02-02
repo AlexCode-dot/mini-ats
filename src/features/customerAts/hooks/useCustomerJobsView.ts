@@ -8,6 +8,7 @@ import {
   type AtsClient,
 } from "@/features/customerAts/services/atsClient";
 import type { CustomerJob } from "@/features/customerAts/types";
+import { toUserMessage } from "@/shared/errors/toUserMessage";
 
 type UseCustomerJobsViewArgs = {
   mode: "customer" | "admin";
@@ -134,9 +135,7 @@ export function useCustomerJobsView({
       await client.deleteJob(pendingDelete.id);
       await refresh();
     } catch (err) {
-      setActionError(
-        err instanceof Error ? err.message : "Failed to delete job"
-      );
+      setActionError(toUserMessage(err, "Failed to delete job."));
     } finally {
       setPendingDelete(null);
     }

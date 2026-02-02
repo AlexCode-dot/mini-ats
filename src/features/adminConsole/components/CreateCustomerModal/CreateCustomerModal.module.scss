@@ -12,3 +12,43 @@
   font-size: 13px;
   color: vars.$color-text-muted;
 }
+
+.noticeSubtext {
+  margin-top: 6px;
+}
+
+.inviteRow {
+  margin-top: 10px;
+}
+
+.inviteButton {
+  border: 1px solid vars.$color-border;
+  background: vars.$color-surface;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: vars.$color-text;
+  cursor: pointer;
+}
+
+.inviteToggle {
+  display: grid;
+  gap: 6px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid vars.$color-border;
+  background: vars.$color-surface;
+}
+
+.inviteLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: vars.$color-text;
+}
+
+.inviteHint {
+  font-size: 12px;
+  color: vars.$color-text-muted;
+}

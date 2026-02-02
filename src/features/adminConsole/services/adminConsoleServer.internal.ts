@@ -244,30 +244,74 @@ export async function createOrganization(
     throw new AdminConsoleError(orgError?.message ?? "Failed to create org");
   }
 
-  const password = payload.password.trim();
-  if (!isPasswordStrong(password)) {
-    throw new AdminConsoleError(
-      `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
-      400
-    );
-  }
+  let inviteLink: string | null = null;
+  let authUserId: string | null = null;
+  let authUserEmail: string | null = null;
 
-  const { data: authUser, error: authError } =
-    await supabase.auth.admin.createUser({
+  if (payload.sendInvite) {
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: "invite",
       email: payload.customerEmail,
-      password,
-      email_confirm: true,
-      user_metadata: {
-        full_name: payload.customerName ?? null,
-      },
+      ...(payload.inviteRedirectTo
+        ? { redirectTo: payload.inviteRedirectTo }
+        : {}),
     });
 
-  if (authError || !authUser.user) {
-    throw new AdminConsoleError(authError?.message ?? "Failed to create user");
+    if (error || !data?.user) {
+      if (error?.message?.toLowerCase().includes("already been registered")) {
+        throw new AdminConsoleError("Email already in use", 409);
+      }
+      throw new AdminConsoleError(
+        error?.message ?? "Failed to generate invite link"
+      );
+    }
+
+    authUserId = data.user.id;
+    authUserEmail = data.user.email ?? payload.customerEmail;
+    inviteLink =
+      typeof data?.properties?.action_link === "string"
+        ? data.properties.action_link
+        : null;
+  } else {
+    const password = payload.password?.trim() ?? "";
+    if (!isPasswordStrong(password)) {
+      throw new AdminConsoleError(
+        `Password must be at least ${MIN_PASSWORD_LENGTH} characters`,
+        400
+      );
+    }
+
+    const { data: authUser, error: authError } =
+      await supabase.auth.admin.createUser({
+        email: payload.customerEmail,
+        password,
+        email_confirm: true,
+        user_metadata: {
+          full_name: payload.customerName ?? null,
+        },
+      });
+
+    if (authError || !authUser.user) {
+      if (
+        authError?.message?.toLowerCase().includes("already been registered")
+      ) {
+        throw new AdminConsoleError("Email already in use", 409);
+      }
+      throw new AdminConsoleError(
+        authError?.message ?? "Failed to create user"
+      );
+    }
+
+    authUserId = authUser.user.id;
+    authUserEmail = authUser.user.email ?? payload.customerEmail;
+  }
+
+  if (!authUserId) {
+    throw new AdminConsoleError("Failed to provision user");
   }
 
   const { error: profileError } = await supabase.from("profiles").insert({
-    id: authUser.user.id,
+    id: authUserId,
     org_id: org.id,
     role: "customer",
     full_name: payload.customerName ?? null,
@@ -315,16 +359,17 @@ export async function createOrganization(
     organization: {
       ...normalizeOrganization(org),
       ...counts,
-      customer_profile_id: authUser.user.id,
+      customer_profile_id: authUserId,
       customer_name: payload.customerName ?? null,
-      customer_email: authUser.user.email ?? payload.customerEmail,
+      customer_email: authUserEmail ?? payload.customerEmail,
     },
     customerProfile: {
-      id: authUser.user.id,
-      email: authUser.user.email ?? payload.customerEmail,
+      id: authUserId,
+      email: authUserEmail ?? payload.customerEmail,
       full_name: payload.customerName ?? null,
       org_id: org.id,
     },
+    inviteLink,
   };
 }
 
