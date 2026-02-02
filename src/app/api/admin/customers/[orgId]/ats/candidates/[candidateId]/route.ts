@@ -31,16 +31,20 @@ export async function PATCH(
       );
     }
 
-    const payload = (await request.json()) as
-      | (UpdateCandidatePayload & { is_archived?: boolean })
-      | { is_archived?: boolean };
+    const payload = (await request.json()) as Partial<UpdateCandidatePayload> & {
+      is_archived?: boolean;
+    };
 
     if (payload?.is_archived === true) {
       await archiveCandidateForOrg(orgId, candidateId);
       return NextResponse.json({ ok: true });
     }
 
-    if (!payload?.name?.trim() || !payload?.jobId) {
+    if (
+      typeof payload.name !== "string" ||
+      !payload.name.trim() ||
+      typeof payload.jobId !== "string"
+    ) {
       return NextResponse.json(
         { error: "Missing name or jobId" },
         { status: 400 }
@@ -52,6 +56,8 @@ export async function PATCH(
       jobId: payload.jobId,
       email: payload.email ?? null,
       linkedinUrl: payload.linkedinUrl ?? null,
+      resumeUrl: payload.resumeUrl ?? null,
+      note: payload.note ?? null,
     });
     return NextResponse.json({ ok: true });
   } catch (error) {

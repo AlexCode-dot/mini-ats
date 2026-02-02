@@ -17,12 +17,19 @@ type CandidateRow = {
   name: string;
   email: string | null;
   linkedin_url: string | null;
+  resume_url: string | null;
+  note: string | null;
   stage_id: string;
   job_id: string | null;
-  jobs?: { title?: string | null } | { title?: string | null }[] | null;
+  jobs?:
+    | { title?: string | null; status?: string | null }
+    | { title?: string | null; status?: string | null }[]
+    | null;
 };
 
-function mapCandidates(rows: CandidateRow[] | null | undefined): CustomerCandidate[] {
+function mapCandidates(
+  rows: CandidateRow[] | null | undefined
+): CustomerCandidate[] {
   return (rows ?? []).map((row) => {
     const job = Array.isArray(row.jobs) ? row.jobs[0] : row.jobs;
     return {
@@ -30,9 +37,12 @@ function mapCandidates(rows: CandidateRow[] | null | undefined): CustomerCandida
       name: row.name,
       email: row.email ?? null,
       linkedin_url: row.linkedin_url ?? null,
+      resume_url: row.resume_url ?? null,
+      note: row.note ?? null,
       stage_id: row.stage_id,
       job_id: row.job_id ?? null,
       job_title: job?.title ?? null,
+      job_status: job?.status ?? null,
     } satisfies CustomerCandidate;
   });
 }
@@ -52,7 +62,9 @@ export async function getOrgNameForAdmin(orgId: string): Promise<string> {
   return data.name;
 }
 
-export async function listStagesForOrg(orgId: string): Promise<CustomerStage[]> {
+export async function listStagesForOrg(
+  orgId: string
+): Promise<CustomerStage[]> {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase
     .from("pipeline_stages")
@@ -89,7 +101,7 @@ export async function listCandidatesForOrg(
   const { data, error } = await supabase
     .from("candidates")
     .select(
-      "id, name, email, linkedin_url, stage_id, job_id, is_archived, jobs(title)"
+      "id, name, email, linkedin_url, resume_url, note, stage_id, job_id, is_archived, jobs(title, status)"
     )
     .eq("org_id", orgId)
     .eq("is_archived", false);
@@ -162,6 +174,8 @@ export async function createCandidateForOrg(
     name: payload.name,
     email: payload.email ?? null,
     linkedin_url: payload.linkedinUrl ?? null,
+    resume_url: payload.resumeUrl ?? null,
+    note: payload.note ?? null,
     stage_id: payload.stageId,
     job_id: payload.jobId,
   });
@@ -183,6 +197,8 @@ export async function updateCandidateForOrg(
       name: payload.name,
       email: payload.email ?? null,
       linkedin_url: payload.linkedinUrl ?? null,
+      resume_url: payload.resumeUrl ?? null,
+      note: payload.note ?? null,
       job_id: payload.jobId,
     })
     .eq("id", candidateId)
@@ -231,10 +247,11 @@ export async function createStagesForOrg(
   stages: StageDraft[]
 ): Promise<CustomerStage[]> {
   const supabase = await createServerSupabaseClient();
-  const payload = stages.map((stage) => ({
+  const payload = stages.map((stage, index) => ({
     org_id: orgId,
     name: stage.name,
-    position: stage.position,
+    // Use temporary high positions to avoid unique conflicts before reorder.
+    position: 1_000_000 + index,
     is_terminal: stage.is_terminal,
   }));
 

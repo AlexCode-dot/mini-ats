@@ -11,6 +11,8 @@ import type {
 } from "@/features/customerAts/types";
 
 let cachedOrgId: string | null = null;
+const RESUME_BUCKET = "candidate-resumes";
+const RESUME_URL_EXPIRY_SECONDS = 60 * 10;
 let cachedUserId: string | null = null;
 let cachedOrgName: string | null = null;
 
@@ -141,7 +143,7 @@ export async function listCustomerCandidates(): Promise<CustomerCandidate[]> {
   const { data, error } = await supabase
     .from("candidates")
     .select(
-      "id, name, email, linkedin_url, stage_id, job_id, is_archived, jobs(title)"
+      "id, name, email, linkedin_url, resume_url, note, stage_id, job_id, is_archived, jobs(title, status)"
     )
     .eq("org_id", orgId)
     .eq("is_archived", false);
@@ -150,16 +152,34 @@ export async function listCustomerCandidates(): Promise<CustomerCandidate[]> {
     throw new Error(error.message);
   }
 
-  return (data ?? []).map((row) => {
+  type CandidateRow = {
+    id: string;
+    name: string;
+    email: string | null;
+    linkedin_url: string | null;
+    resume_url: string | null;
+    note: string | null;
+    stage_id: string;
+    job_id: string | null;
+    jobs:
+      | { title: string | null; status: string | null }
+      | { title: string | null; status: string | null }[]
+      | null;
+  };
+
+  return (data ?? []).map((row: CandidateRow) => {
     const job = Array.isArray(row.jobs) ? row.jobs[0] : row.jobs;
     return {
       id: row.id,
       name: row.name,
       email: row.email ?? null,
       linkedin_url: row.linkedin_url ?? null,
+      resume_url: row.resume_url ?? null,
+      note: row.note ?? null,
       stage_id: row.stage_id,
       job_id: row.job_id ?? null,
       job_title: job?.title ?? null,
+      job_status: job?.status ?? null,
     } satisfies CustomerCandidate;
   });
 }
@@ -184,6 +204,8 @@ export async function createCandidate(payload: CreateCandidatePayload) {
     name: payload.name,
     email: payload.email ?? null,
     linkedin_url: payload.linkedinUrl ?? null,
+    resume_url: payload.resumeUrl ?? null,
+    note: payload.note ?? null,
     stage_id: payload.stageId,
     job_id: payload.jobId,
   });
@@ -219,6 +241,8 @@ export async function updateCandidate(
       name: payload.name,
       email: payload.email ?? null,
       linkedin_url: payload.linkedinUrl ?? null,
+      resume_url: payload.resumeUrl ?? null,
+      note: payload.note ?? null,
       job_id: payload.jobId,
     })
     .eq("id", candidateId);
@@ -264,11 +288,75 @@ export async function updateStages(stages: CustomerStage[]) {
   }
 }
 
+function sanitizeResumeFilename(value: string) {
+  return value
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9._-]/g, "");
+}
+
+export async function uploadCandidateResume(
+  file: File,
+  orgIdOverride?: string
+) {
+  const supabase = createBrowserSupabaseClient();
+  const orgId = orgIdOverride ?? (await getOrgId());
+  const safeName = sanitizeResumeFilename(file.name || "resume.pdf");
+  const nonce =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const filePath = `${orgId}/${nonce}-${safeName}`;
+  const { error } = await supabase.storage
+    .from(RESUME_BUCKET)
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      contentType: file.type || "application/pdf",
+      upsert: false,
+    });
+
+  if (error) {
+    throw new Error("Unable to upload resume.");
+  }
+
+  return filePath;
+}
+
+export async function getCandidateResumeUrl(path: string) {
+  const supabase = createBrowserSupabaseClient();
+  const { data, error } = await supabase.storage
+    .from(RESUME_BUCKET)
+    .createSignedUrl(path, RESUME_URL_EXPIRY_SECONDS);
+
+  if (error || !data?.signedUrl) {
+    throw new Error("Unable to load resume.");
+  }
+
+  return data.signedUrl;
+}
+
+export async function deleteCandidateResume(
+  path: string,
+  orgIdOverride?: string
+) {
+  if (!path) return;
+  const supabase = createBrowserSupabaseClient();
+  const orgId = orgIdOverride ?? (await getOrgId());
+  if (!path.startsWith(`${orgId}/`)) {
+    throw new Error("Resume path mismatch.");
+  }
+  const { error } = await supabase.storage.from(RESUME_BUCKET).remove([path]);
+  if (error) {
+    throw new Error("Unable to remove resume.");
+  }
+}
+
 export async function createStages(stages: StageDraft[]) {
   const supabase = createBrowserSupabaseClient();
-  const payload = stages.map((stage) => ({
+  const payload = stages.map((stage, index) => ({
     name: stage.name,
-    position: stage.position,
+    // Use temporary high positions to avoid unique conflicts before reorder.
+    position: 1_000_000 + index,
     is_terminal: stage.is_terminal,
   }));
 

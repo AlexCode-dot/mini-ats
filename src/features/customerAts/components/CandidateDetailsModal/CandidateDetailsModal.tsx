@@ -1,11 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import Badge from "@/shared/components/Badge/Badge";
 import Button from "@/shared/components/Button/Button";
 import Modal from "@/shared/components/Modal/Modal";
 import ActionMenu from "@/shared/components/ActionMenu/ActionMenu";
 import type { CustomerCandidate } from "@/features/customerAts/types";
 import { isHttpUrl } from "@/shared/utils/urlHelpers";
+import { getCandidateResumeUrl } from "@/features/customerAts/services/customerAtsClient";
 import styles from "@/features/customerAts/components/CandidateDetailsModal/CandidateDetailsModal.module.scss";
 
 type CandidateDetailsModalProps = {
@@ -23,6 +26,50 @@ export default function CandidateDetailsModal({
   onEdit,
   onArchive,
 }: CandidateDetailsModalProps) {
+  const [resumeLink, setResumeLink] = useState<string | null>(null);
+  const [resumeError, setResumeError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadResume = async () => {
+      if (!candidate?.resume_url) {
+        if (isMounted) {
+          setResumeLink(null);
+          setResumeError(null);
+        }
+        return;
+      }
+
+      if (isHttpUrl(candidate.resume_url)) {
+        if (isMounted) {
+          setResumeLink(candidate.resume_url);
+          setResumeError(null);
+        }
+        return;
+      }
+
+      try {
+        const url = await getCandidateResumeUrl(candidate.resume_url);
+        if (isMounted) {
+          setResumeLink(url);
+          setResumeError(null);
+        }
+      } catch {
+        if (isMounted) {
+          setResumeLink(null);
+          setResumeError("Resume unavailable");
+        }
+      }
+    };
+
+    void loadResume();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [candidate]);
+
   if (!candidate) return null;
 
   return (
@@ -46,7 +93,12 @@ export default function CandidateDetailsModal({
         <div className={styles.row}>
           <span className={styles.label}>Job</span>
           {candidate.job_title ? (
-            <span className={styles.value}>{candidate.job_title}</span>
+            <span className={styles.jobRow}>
+              <span className={styles.value}>{candidate.job_title}</span>
+              {candidate.job_status === "closed" ? (
+                <span className={styles.closedBadge}>Closed</span>
+              ) : null}
+            </span>
           ) : (
             <Badge variant="inactive">No job linked</Badge>
           )}
@@ -76,6 +128,31 @@ export default function CandidateDetailsModal({
             )
           ) : (
             <span className={styles.valueMuted}>No link</span>
+          )}
+        </div>
+        <div className={styles.row}>
+          <span className={styles.label}>Resume</span>
+          {resumeLink ? (
+            <a
+              className={styles.link}
+              href={resumeLink}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Download resume
+            </a>
+          ) : resumeError ? (
+            <span className={styles.valueMuted}>{resumeError}</span>
+          ) : (
+            <span className={styles.valueMuted}>No resume</span>
+          )}
+        </div>
+        <div className={styles.row}>
+          <span className={styles.label}>Note</span>
+          {candidate.note ? (
+            <span className={styles.valueMultiline}>{candidate.note}</span>
+          ) : (
+            <span className={styles.valueMuted}>No notes</span>
           )}
         </div>
       </div>

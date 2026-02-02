@@ -8,6 +8,7 @@ import type {
   CustomerJob,
   CustomerStage,
 } from "@/features/customerAts/types";
+import { toUserMessage } from "@/shared/errors/toUserMessage";
 
 type AtsBoardState = {
   stages: CustomerStage[];
@@ -39,7 +40,7 @@ export function useAtsBoard(client: AtsClient) {
       setState((prev) => ({
         ...prev,
         isLoading: false,
-        error: err instanceof Error ? err.message : "Failed to load data",
+        error: toUserMessage(err, "Unable to load ATS data."),
       }));
     }
   }, [client]);

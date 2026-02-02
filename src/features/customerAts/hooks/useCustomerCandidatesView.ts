@@ -18,6 +18,7 @@ import type {
   CustomerJob,
   CustomerStage,
 } from "@/features/customerAts/types";
+import { toUserMessage } from "@/shared/errors/toUserMessage";
 
 type UseCustomerCandidatesViewArgs = {
   mode: "customer" | "admin";
@@ -241,9 +242,7 @@ export function useCustomerCandidatesView({
           )
         );
       }
-      setActionError(
-        err instanceof Error ? err.message : "Failed to move candidate"
-      );
+      setActionError(toUserMessage(err, "Failed to move candidate."));
     }
   };
 
@@ -253,7 +252,7 @@ export function useCustomerCandidatesView({
       await client.archiveCandidate(pendingArchive.id);
       await refresh();
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : "Failed to archive");
+      setActionError(toUserMessage(err, "Failed to archive candidate."));
     } finally {
       setPendingArchive(null);
     }

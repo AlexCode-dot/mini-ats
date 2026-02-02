@@ -59,7 +59,12 @@ export default function CandidateCard({
       </button>
       <div className={styles.name}>{candidate.name}</div>
       {candidate.job_title ? (
-        <div className={styles.role}>{candidate.job_title}</div>
+        <div className={styles.roleRow}>
+          <span className={styles.role}>{candidate.job_title}</span>
+          {candidate.job_status === "closed" ? (
+            <span className={styles.closedBadge}>Closed</span>
+          ) : null}
+        </div>
       ) : (
         <div className={styles.warning}>
           <span className={styles.warningIcon} aria-hidden>

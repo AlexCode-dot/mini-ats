@@ -56,7 +56,19 @@ export default function CustomerJobsView({
         <ScrollArea className={styles.listScroll} orientation="y">
           <TableCard title={`Jobs (${data.jobCount})`}>
             {data.jobs.length === 0 ? (
-              <div className={styles.empty}>No jobs yet.</div>
+              <div className={styles.emptyState}>
+                <div className={styles.emptyTitle}>No jobs yet</div>
+                <div className={styles.emptyText}>
+                  Create your first job to start tracking candidates.
+                </div>
+                <Button
+                  type="button"
+                  startIcon="+"
+                  onClick={actions.openCreate}
+                >
+                  Create Job
+                </Button>
+              </div>
             ) : (
               <>
                 <table className={styles.table}>

@@ -73,6 +73,8 @@ export async function POST(
       stageId: payload.stageId,
       email: payload.email ?? null,
       linkedinUrl: payload.linkedinUrl ?? null,
+      resumeUrl: payload.resumeUrl ?? null,
+      note: payload.note ?? null,
     });
     return NextResponse.json({ ok: true });
   } catch (error) {
