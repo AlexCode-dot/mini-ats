@@ -20,13 +20,15 @@ type CreateAdminModalProps = {
 };
 
 function generatePassword() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
+  const cryptoObj = typeof globalThis !== "undefined" ? globalThis.crypto : undefined;
+
+  if (cryptoObj?.randomUUID) {
+    return cryptoObj.randomUUID();
   }
 
-  if (typeof crypto !== "undefined" && "getRandomValues" in crypto) {
+  if (cryptoObj?.getRandomValues) {
     const buffer = new Uint32Array(4);
-    crypto.getRandomValues(buffer);
+    cryptoObj.getRandomValues(buffer);
     return Array.from(buffer, (value) => value.toString(36)).join("");
   }
 
@@ -45,6 +47,7 @@ export default function CreateAdminModal({
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [createdPassword, setCreatedPassword] = useState<string | null>(null);
+  const [isPasswordCopied, setIsPasswordCopied] = useState(false);
   const formId = "create-admin-form";
 
   if (!open) return null;
@@ -53,10 +56,18 @@ export default function CreateAdminModal({
     setIsSuccess(false);
     setCreatedPassword(null);
     setError(null);
+    setIsPasswordCopied(false);
     setEmail("");
     setName("");
     setPassword("");
     onClose();
+  };
+
+  const handleCopyPassword = async () => {
+    if (!createdPassword) return;
+    await navigator.clipboard?.writeText(createdPassword);
+    setIsPasswordCopied(true);
+    window.setTimeout(() => setIsPasswordCopied(false), 2000);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -97,13 +108,9 @@ export default function CreateAdminModal({
               type="button"
               variant="secondary"
               size="sm"
-              onClick={() =>
-                createdPassword
-                  ? void navigator.clipboard?.writeText(createdPassword)
-                  : null
-              }
+              onClick={handleCopyPassword}
             >
-              Copy password
+              {isPasswordCopied ? "Password copied" : "Copy password"}
             </Button>
             <Button type="button" onClick={handleClose}>
               Close

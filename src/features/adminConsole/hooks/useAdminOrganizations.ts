@@ -16,6 +16,7 @@ import type {
   UpdateOrganizationPayload,
   UpdateOrganizationResponse,
 } from "@/features/adminConsole/types";
+import { toUserMessage } from "@/shared/errors/toUserMessage";
 
 export type AdminOrganizationsState = {
   isLoading: boolean;
@@ -61,8 +62,7 @@ export function useAdminOrganizations(): AdminOrganizations {
       const data = await fetchOrganizations();
       setOrganizations(data);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to load";
-      setError(message);
+      setError(toUserMessage(err, "Unable to load organizations."));
     } finally {
       setIsLoading(false);
     }
@@ -98,8 +98,7 @@ export function useAdminOrganizations(): AdminOrganizations {
         prev.map((org) => (org.id === orgId ? updated : org))
       );
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to update";
-      setActionError(message);
+      setActionError(toUserMessage(err, "Unable to update organization."));
       setOrganizations((prev) =>
         prev.map((org) =>
           org.id === orgId ? { ...org, is_active: !isActive } : org
@@ -128,8 +127,7 @@ export function useAdminOrganizations(): AdminOrganizations {
         );
         return result;
       } catch (err) {
-        const message = err instanceof Error ? err.message : "Failed to update";
-        setActionError(message);
+        setActionError(toUserMessage(err, "Unable to update organization."));
         throw err;
       } finally {
         setSavingOrgIds((prev) => prev.filter((id) => id !== payload.orgId));
